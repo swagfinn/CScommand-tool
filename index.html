@@ -1,1 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deposit 指令生成器 — 客服內部工具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  :root {
+    --bg-page:     #0e1117;
+    --bg-panel:    #161b22;
+    --bg-input:    #0d1117;
+    --bg-card:     #1c2128;
+    --bg-hover:    #21262d;
+    --border:      #30363d;
+    --border-light:#21262d;
+    --text-primary:#e6edf3;
+    --text-secondary:#8b949e;
+    --text-muted:  #484f58;
+    --accent:      #1a7f5a;
+    --accent-light:#56d364;
+    --accent-bg:   #0d2818;
+    --accent-hover:#2ea043;
+    --blue:        #79c0ff;
+    --orange:      #ffa657;
+    --green:       #7ee787;
+    --purple:      #d2a8ff;
+    --yellow:      #e3b341;
+    --red:         #f85149;
+    --font-ui: 'Noto Sans TC', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-ui);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .app-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .app-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+  .app-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  .version-badge {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 20px;
+    align-self: center;
+  }
+
+  /* ── Main container ── */
+  .container {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* ── Mode tabs ── */
+  .mode-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px;
+  }
+  .tab {
+    padding: 10px 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.3;
+  }
+  .tab .tab-icon { font-size: 16px; }
+  .tab:hover:not(.active):not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
+  .tab.active {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .tab:disabled { opacity: 0.35; cursor: not-allowed; }
+  .tab .tab-chip {
+    font-size: 10px;
+    background: var(--bg-hover);
+    color: var(--text-muted);
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-family: var(--font-mono);
+  }
+  .tab.active .tab-chip {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* ── Panel ── */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-card);
+  }
+  .panel-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .panel-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-light);
+  }
+  .panel-body { padding: 16px; }
+
+  /* ── Textarea ── */
+  textarea {
+    width: 100%;
+    min-height: 210px;
+    resize: vertical;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  textarea::placeholder { color: var(--text-muted); }
+  textarea:focus { border-color: var(--accent); }
+
+  /* ── Parse button ── */
+  .parse-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .parse-btn:hover { background: var(--accent-hover); }
+  .parse-btn:active { transform: scale(0.99); }
+
+  /* ── Error ── */
+  .error-bar {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: #2d1117;
+    border: 1px solid #6d1a1a;
+    color: #f85149;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+  .error-bar.show { display: flex; }
+
+  /* ── Fields grid ── */
+  .fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .field-wide { grid-column: 1 / -1; }
+
+  .field-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .field-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .field-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 2px 0 4px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-bottom-color: var(--accent-light); }
+  .field-static {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--purple);
+    padding: 2px 0;
+  }
+
+  /* ── Command output ── */
+  .cmd-box {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    position: relative;
+  }
+  .cmd-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cmd-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-light);
+  }
+  .cmd-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    word-break: break-all;
+    padding-right: 80px;
+  }
+  .cmd-text .kw   { color: var(--blue); font-weight: 600; }
+  .cmd-text .user { color: var(--orange); }
+  .cmd-text .amt  { color: var(--green); font-weight: 600; }
+  .cmd-text .rsn  { color: var(--purple); }
+  .cmd-placeholder { color: var(--text-muted); font-style: italic; }
+
+  .copy-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: var(--border); color: var(--text-primary); }
+  .copy-btn.copied {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+
+  /* ── Section heading ── */
+  .section-heading {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .section-heading::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 12px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* ── Result section ── */
+  #result-section { display: none; }
+  #result-section.show { display: block; }
+
+  .divider { height: 1px; background: var(--border-light); margin: 1rem 0; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card);
+    border: 1px solid var(--accent);
+    color: var(--accent-light);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transition: all 0.25s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ── Reason dropdown ── */
+  .reason-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.1s;
+    border-bottom: 0.5px solid var(--border-light);
+  }
+  .reason-item:last-child { border-bottom: none; }
+  .reason-item:hover { background: var(--bg-hover); }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 2.5rem;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">
+    <div class="logo-icon">💎</div>
+    <div>
+      <div class="app-name">Deposit 指令生成器</div>
+      <div class="app-sub">@jbot-test · 客服內部快速指令工具</div>
+    </div>
+  </div>
+  <div class="version-badge">v1.0</div>
+</header>
+
+<main class="container">
+
+  <!-- Mode tabs -->
+  <div class="mode-tabs" role="tablist">
+    <button class="tab active" role="tab" aria-selected="true" data-mode="1">
+      <span class="tab-icon">💎</span>
+      <span>補派鑽石</span>
+      <span class="tab-chip">支付成功未派</span>
+    </button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="2">
+      <span class="tab-icon">🎭</span>
+      <span>騙點補鑽</span>
+      <span class="tab-chip">REWH 案件</span>
+    </button>
+    <button class="tab" role="tab" aria-selected="false" disabled data-mode="3">
+      <span class="tab-icon">⚙️</span>
+      <span>模式 3</span>
+      <span class="tab-chip">即將推出</span>
+    </button>
+  </div>
+
+  <!-- Mode 1: Input panel -->
+  <div class="panel" id="panel-mode1">
+    <div class="panel-header">
+      <div class="panel-dot"></div>
+      <span class="panel-title">貼上訂單資訊</span>
+    </div>
+    <div class="panel-body">
+      <textarea
+        id="raw-input"
+        spellcheck="false"
+        placeholder="將後台訂單資訊完整貼上…"
+      ></textarea>
+      <button class="parse-btn" onclick="parseOrder()">
+        ✦ 生成掉單上分指令
+      </button>
+      <div class="error-bar" id="error-bar">
+        <span>⚠</span>
+        <span id="error-msg"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 2: Manual input panel -->
+  <div class="panel" id="panel-mode2" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--orange)"></div>
+      <span class="panel-title">騙點補鑽 — 手動輸入</span>
+    </div>
+    <div class="panel-body">
+      <div class="fields-grid">
+        <div class="field-card field-wide">
+          <div class="field-label">User Name（用戶）</div>
+          <input class="field-input" id="m2-username" type="text" autocomplete="off" oninput="buildCmd2()">
+        </div>
+        <div class="field-card field-wide">
+          <div class="field-label">CP Name（主播）</div>
+          <input class="field-input" id="m2-cpname" type="text" autocomplete="off" oninput="buildCmd2()">
+        </div>
+        <div class="field-card field-wide">
+          <div class="field-label">Amount（鑽石數，支援多筆加總）</div>
+          <input class="field-input" id="m2-amount-raw" type="text" autocomplete="off"
+            oninput="updateAmountPreview()">
+          <div id="m2-amount-preview" style="font-size:11px;color:var(--accent-light);margin-top:5px;font-family:var(--font-mono);min-height:16px"></div>
+        </div>
+        <div class="field-card field-wide" style="position:relative">
+          <div class="field-label">Reason（原因說明）</div>
+          <input class="field-input" id="m2-reason" type="text" autocomplete="off"
+            oninput="buildCmd2(); saveReason(this.value)"
+            onfocus="showReasonDropdown()"
+            onblur="hideReasonDropdown()">
+          <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+            <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
+            <div id="reason-list"></div>
+            <div id="reason-empty" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
+          </div>
+        </div>
+      </div>
+      <button class="parse-btn" style="background:var(--orange);margin-top:4px" onclick="generateScamCmd()" onmouseover="this.style.background='#e8903a'" onmouseout="this.style.background='var(--orange)'">
+        ✦ 生成騙點補鑽指令
+      </button>
+      <div class="error-bar" id="error-bar2">
+        <span>⚠</span>
+        <span id="error-msg2"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result panel -->
+  <div class="panel" id="result-section">
+    <div class="panel-header">
+      <div class="panel-dot"></div>
+      <span class="panel-title">擷取結果</span>
+    </div>
+    <div class="panel-body">
+      <div class="section-heading">擷取欄位（可手動修改）</div>
+      <div class="fields-grid">
+        <div class="field-card">
+          <div class="field-label">Username</div>
+          <input class="field-input" id="f-username" type="text" autocomplete="off" oninput="buildCmd()">
+        </div>
+        <div class="field-card">
+          <div class="field-label">Amount（鑽石數）</div>
+          <input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="buildCmd()">
+        </div>
+        <div class="field-card field-wide">
+          <div class="field-label">Order ID</div>
+          <input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()">
+        </div>
+        <div class="field-card">
+          <div class="field-label">Payment Gateway</div>
+          <input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="buildCmd()">
+        </div>
+        <div class="field-card">
+          <div class="field-label">Reason 前綴（固定）</div>
+          <div class="field-static">cs:refill_purchase_</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-heading">生成指令</div>
+      <div class="cmd-box">
+        <div class="cmd-label">jbot command</div>
+        <div class="cmd-text" id="cmd-display">
+          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
+        </div>
+        <button class="copy-btn" id="copy-btn" onclick="copyCmd()">
+          <span id="copy-icon">📋</span>
+          <span id="copy-label">複製</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 2: Result panel -->
+  <div class="panel" id="result-section2" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--orange)"></div>
+      <span class="panel-title">生成指令</span>
+    </div>
+    <div class="panel-body">
+      <div class="cmd-box">
+        <div class="cmd-label">jbot command</div>
+        <div class="cmd-text" id="cmd-display2">
+          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
+        </div>
+        <button class="copy-btn" id="copy-btn2" onclick="copyCmd2()">
+          <span id="copy-icon2">📋</span>
+          <span id="copy-label2">複製</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast">✓ 已複製到剪貼簿</div>
+
+<footer class="footer">Swag Live · 客服內部工具 · 僅供內部使用</footer>
+
+<script>
+// ── Tab switching ───────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.tab[data-mode]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.disabled) return;
+      switchMode(+btn.dataset.mode);
+    });
+  });
+});
+
+let currentMode = 1;
+
+function switchMode(m) {
+  currentMode = m;
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.classList.toggle('active', +t.dataset.mode === m);
+    t.setAttribute('aria-selected', String(+t.dataset.mode === m));
+  });
+  document.getElementById('panel-mode1').style.display  = m === 1 ? '' : 'none';
+  document.getElementById('panel-mode2').style.display  = m === 2 ? '' : 'none';
+  var r1 = document.getElementById('result-section');
+  if (m !== 1) r1.classList.remove('show');
+  r1.style.display = m === 1 ? '' : 'none';
+  document.getElementById('result-section2').style.display = m === 2 ? '' : 'none';
+}
+
+// ── Shared helpers ──────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function val(id) {
+  return document.getElementById(id).value.trim();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (msg) t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () {
+    t.classList.remove('show');
+    t.textContent = '✓ 已複製到剪貼簿';
+  }, 2500);
+}
+
+function doCopy(text, onDone) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onDone).catch(function () {
+      fallbackCopy(text); onDone();
+    });
+  } else {
+    fallbackCopy(text); onDone();
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+// ── Mode 1: 補派鑽石 ────────────────────────────────────────────────────────
+var lastCmd = '';
+
+function normalizeOrder(text) {
+  var keys = [
+    'Order Details for', 'User ID', 'Username', 'Created', 'Canceled',
+    'Paid', 'Fulfilled', 'Payment Gateway', 'Payment ID', 'Total'
+  ];
+  var out = text;
+  keys.forEach(function (k) {
+    var re = new RegExp('(?<!\n)(' + k.replace(' ', '\\s*') + ':)', 'g');
+    out = out.replace(re, '\n$1');
+  });
+  out = out.replace(/(?<!\n)(Order Details for\s+[a-f0-9]{20,})/i, '\n$1');
+  return out;
+}
+
+function parseOrder() {
+  var raw = normalizeOrder(document.getElementById('raw-input').value.trim());
+  hideError();
+  if (!raw) { showError('請先貼上訂單資訊'); return; }
+
+  var username = matchToken(raw, /^Username:\s*(\S+)/m);
+  var gateway  = extractGateway(raw);
+  var orderId  = extractOrderId(raw);
+  var amount   = extractAmount(raw);
+
+  var missing = [];
+  if (!username) missing.push('Username');
+  if (!amount)   missing.push('Amount');
+  if (!orderId)  missing.push('Order ID');
+  if (!gateway)  missing.push('Payment Gateway');
+
+  if (missing.length) {
+    showError('無法擷取：' + missing.join('、') + '，請確認格式是否正確');
+    return;
+  }
+
+  document.getElementById('f-username').value = username;
+  document.getElementById('f-amount').value   = amount;
+  document.getElementById('f-orderid').value  = orderId;
+  document.getElementById('f-gateway').value  = gateway;
+
+  document.getElementById('result-section').classList.add('show');
+  buildCmd();
+  autoCopyCmd();
+  document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function matchLine(text, regex) {
+  var m = text.match(regex);
+  return m ? m[1].split('\n')[0].trim() : null;
+}
+
+function matchToken(text, regex) {
+  var m = text.match(regex);
+  if (!m) return null;
+  var v = m[1].split(/\s/)[0].trim();
+  return v === 'None' ? null : v;
+}
+
+function extractOrderId(text) {
+  var m1 = text.match(/Order Details for\s+([a-f0-9]{20,})/i);
+  if (m1) return m1[1].trim();
+  var m2 = text.match(/Order ID[:\s]+([a-f0-9]{20,})/i);
+  if (m2) return m2[1].trim();
+  var m3 = text.match(/([a-f0-9]{24})/i);
+  if (m3) return m3[1].trim();
+  return null;
+}
+
+function extractAmount(text) {
+  var m = text.match(/(\d+)-diamonds/i);
+  if (m) return m[1];
+  var m2 = text.match(/Amount[:\s]+(\d+)/i);
+  if (m2) return m2[1];
+  return null;
+}
+
+var KNOWN_GATEWAYS = [
+  'happypay', 'xenopay', 'epoint', 'paydollar', 'newebpay',
+  'ecpay', 'linepay', 'jkopay', 'creditcard', 'atm'
+];
+
+function extractGateway(text) {
+  var m1 = text.match(/^Payment\s*Gateway:\s*(\S+)/im);
+  if (m1 && m1[1].toLowerCase() !== 'none') return m1[1].toLowerCase();
+  var m2 = text.match(/payment-gateway-fee-([a-z0-9]+)/i);
+  if (m2) return m2[1].toLowerCase();
+  var lower = text.toLowerCase();
+  for (var i = 0; i < KNOWN_GATEWAYS.length; i++) {
+    if (lower.indexOf(KNOWN_GATEWAYS[i]) !== -1) return KNOWN_GATEWAYS[i];
+  }
+  return null;
+}
+
+function buildCmd() {
+  var u = val('f-username'), a = val('f-amount'), o = val('f-orderid'), g = val('f-gateway');
+  var display = document.getElementById('cmd-display');
+  if (!u || !a || !o || !g) {
+    display.innerHTML = '<span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>';
+    lastCmd = ''; return;
+  }
+  lastCmd = '@jbot-test deposit ' + u + '/' + a + ' cs:refill_purchase_' + g + '_' + o;
+  display.innerHTML =
+    '<span class="kw">@jbot-test deposit</span> ' +
+    '<span class="user">' + esc(u) + '</span>' +
+    '<span style="color:var(--text-secondary)">/</span>' +
+    '<span class="amt">' + esc(a) + '</span> ' +
+    '<span class="rsn">cs:refill_purchase_' + esc(g) + '_' + esc(o) + '</span>';
+}
+
+function autoCopyCmd() {
+  if (!lastCmd) return;
+  doCopy(lastCmd, function () {
+    var btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    document.getElementById('copy-icon').textContent  = '✓';
+    document.getElementById('copy-label').textContent = '已複製！';
+    showToast('✓ 指令已自動複製到剪貼簿');
+    setTimeout(function () {
+      btn.classList.remove('copied');
+      document.getElementById('copy-icon').textContent  = '📋';
+      document.getElementById('copy-label').textContent = '複製';
+    }, 3000);
+  });
+}
+
+function copyCmd() {
+  if (!lastCmd) return;
+  doCopy(lastCmd, function () {
+    var btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    document.getElementById('copy-icon').textContent  = '✓';
+    document.getElementById('copy-label').textContent = '已複製！';
+    showToast();
+    setTimeout(function () {
+      btn.classList.remove('copied');
+      document.getElementById('copy-icon').textContent  = '📋';
+      document.getElementById('copy-label').textContent = '複製';
+    }, 2500);
+  });
+}
+
+function showError(msg) {
+  document.getElementById('error-msg').textContent = msg;
+  document.getElementById('error-bar').classList.add('show');
+}
+function hideError() {
+  document.getElementById('error-bar').classList.remove('show');
+}
+
+// ── Mode 2: 騙點補鑽 ────────────────────────────────────────────────────────
+var lastCmd2 = '';
+
+// Strip thousand-separator commas, then split on whitespace/newlines
+function parseAmounts(raw) {
+  var cleaned = raw.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+  var parts = cleaned.split(' ').filter(function (s) { return s !== ''; });
+  var nums = parts.map(Number);
+  if (nums.some(function (n) { return isNaN(n) || n < 0; })) return null;
+  return nums.reduce(function (a, b) { return a + b; }, 0);
+}
+
+function getAmountParts(raw) {
+  var cleaned = raw.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+  return cleaned.split(' ').filter(function (s) { return s !== ''; });
+}
+
+function updateAmountPreview() {
+  var raw     = document.getElementById('m2-amount-raw').value;
+  var preview = document.getElementById('m2-amount-preview');
+  if (!raw.trim()) { preview.textContent = ''; buildCmd2(); return; }
+  var total = parseAmounts(raw);
+  if (total === null) {
+    preview.style.color = 'var(--red)';
+    preview.textContent = '⚠ 包含非數字，請確認';
+  } else {
+    var parts = getAmountParts(raw);
+    if (parts.length > 1) {
+      preview.style.color = 'var(--accent-light)';
+      preview.textContent = parts.join(' + ') + ' = ' + total + ' 鑽';
+    } else {
+      preview.style.color = 'var(--text-muted)';
+      preview.textContent = total + ' 鑽';
+    }
+  }
+  buildCmd2();
+}
+
+function buildCmd2() {
+  var u = val('m2-username'), cp = val('m2-cpname');
+  var amtRaw = document.getElementById('m2-amount-raw').value;
+  var reason = val('m2-reason');
+  var display = document.getElementById('cmd-display2');
+  if (!display) return;
+  if (!u || !cp || !amtRaw.trim() || !reason) {
+    display.innerHTML = '<span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>';
+    lastCmd2 = ''; return;
+  }
+  var total = parseAmounts(amtRaw);
+  if (!total) {
+    display.innerHTML = '<span class="cmd-placeholder">Amount 格式有誤…</span>';
+    lastCmd2 = ''; return;
+  }
+  lastCmd2 = '@jbot-test deposit ' + u + '/' + total + ' cs:refund_creator_scam_' + cp + '_' + reason;
+  display.innerHTML =
+    '<span class="kw">@jbot-test deposit</span> ' +
+    '<span class="user">' + esc(u) + '</span>' +
+    '<span style="color:var(--text-secondary)">/</span>' +
+    '<span class="amt">' + total + '</span> ' +
+    '<span class="rsn">cs:refund_creator_scam_' + esc(cp) + '_' + esc(reason) + '</span>';
+}
+
+function generateScamCmd() {
+  var u = val('m2-username'), cp = val('m2-cpname');
+  var amtRaw = document.getElementById('m2-amount-raw').value;
+  var reason = val('m2-reason');
+  var errEl  = document.getElementById('error-bar2');
+  var errMsg = document.getElementById('error-msg2');
+  errEl.classList.remove('show');
+
+  var missing = [];
+  if (!u)             missing.push('User Name');
+  if (!cp)            missing.push('CP Name');
+  if (!amtRaw.trim()) missing.push('Amount');
+  if (!reason)        missing.push('Reason');
+  if (missing.length) { errMsg.textContent = '請填寫：' + missing.join('、'); errEl.classList.add('show'); return; }
+
+  var total = parseAmounts(amtRaw);
+  if (!total) { errMsg.textContent = 'Amount 包含非數字，請確認'; errEl.classList.add('show'); return; }
+
+  buildCmd2();
+  saveReason(reason);
+  document.getElementById('result-section2').style.display = '';
+  autoCopyCmd2();
+  document.getElementById('result-section2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function autoCopyCmd2() {
+  if (!lastCmd2) return;
+  doCopy(lastCmd2, function () {
+    var btn = document.getElementById('copy-btn2');
+    btn.classList.add('copied');
+    document.getElementById('copy-icon2').textContent  = '✓';
+    document.getElementById('copy-label2').textContent = '已複製！';
+    showToast('✓ 指令已自動複製到剪貼簿');
+    setTimeout(function () {
+      btn.classList.remove('copied');
+      document.getElementById('copy-icon2').textContent  = '📋';
+      document.getElementById('copy-label2').textContent = '複製';
+    }, 3000);
+  });
+}
+
+function copyCmd2() {
+  if (!lastCmd2) return;
+  doCopy(lastCmd2, function () {
+    var btn = document.getElementById('copy-btn2');
+    btn.classList.add('copied');
+    document.getElementById('copy-icon2').textContent  = '✓';
+    document.getElementById('copy-label2').textContent = '已複製！';
+    showToast();
+    setTimeout(function () {
+      btn.classList.remove('copied');
+      document.getElementById('copy-icon2').textContent  = '📋';
+      document.getElementById('copy-label2').textContent = '複製';
+    }, 2500);
+  });
+}
+
+// ── Reason history ───────────────────────────────────────────────────────────
+var REASON_KEY = 'jbot_reasons_v1';
+
+function loadReasons() {
+  try { return JSON.parse(localStorage.getItem(REASON_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function saveReason(v) {
+  v = v.trim();
+  if (!v) return;
+  var list = loadReasons().filter(function (r) { return r !== v; });
+  list.unshift(v);
+  if (list.length > 8) list = list.slice(0, 8);
+  localStorage.setItem(REASON_KEY, JSON.stringify(list));
+  renderReasonList();
+}
+
+function renderReasonList() {
+  var list  = loadReasons();
+  var el    = document.getElementById('reason-list');
+  var empty = document.getElementById('reason-empty');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  el.innerHTML = list.map(function (r, i) {
+    var safe = r.replace(/'/g, "\\'").replace(/</g, '&lt;');
+    return '<div class="reason-item" onmousedown="pickReason(event,\'' + safe + '\')">' +
+           '<span style="font-size:10px;color:var(--text-muted);min-width:14px;font-family:var(--font-mono)">' + (i + 1) + '</span>' +
+           '<span style="flex:1;font-size:13px;color:var(--text-primary)">' + esc(r) + '</span>' +
+           '</div>';
+  }).join('');
+}
+
+function pickReason(e, v) {
+  e.preventDefault();
+  var inp = document.getElementById('m2-reason');
+  inp.value = v;
+  buildCmd2();
+  hideReasonDropdown();
+}
+
+var reasonHideTimer = null;
+
+function showReasonDropdown() {
+  clearTimeout(reasonHideTimer);
+  renderReasonList();
+  var dd = document.getElementById('reason-dropdown');
+  if (dd) dd.style.display = 'block';
+}
+
+function hideReasonDropdown() {
+  reasonHideTimer = setTimeout(function () {
+    var dd = document.getElementById('reason-dropdown');
+    if (dd) dd.style.display = 'none';
+  }, 180);
+}
+</script>
+</body>
+</html>
