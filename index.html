@@ -437,8 +437,8 @@
   /* ── Mode 3 select ── */
   .m3-select {
     width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
+    background: #1a2744;
+    border: 1.5px solid #3b6fd4;
     border-radius: 8px;
     color: var(--text-primary);
     font-family: var(--font-ui);
@@ -448,14 +448,51 @@
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2379c0ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
     padding-right: 36px;
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background 0.15s;
   }
-  .m3-select:focus { border-color: var(--accent); }
+  .m3-select:focus { border-color: #79c0ff; background: #1e2f52; }
+  .m3-select:hover { border-color: #5a9af0; }
   .m3-select option { background: #1c2128; color: var(--text-primary); }
+
+  /* ── Mode 3 dual slot layout ── */
+  .m3-slots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .m3-slots { grid-template-columns: 1fr; }
+  }
+  .m3-slot {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .m3-slot-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7c8ea6;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .m3-slot-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 11px;
+    background: var(--purple);
+    border-radius: 2px;
+  }
 
   .tag-badge {
     display: inline-block;
@@ -661,10 +698,12 @@
       <span class="panel-title">補鑽指令 — 常用區</span>
     </div>
     <div class="panel-body">
-      <div class="fields-grid">
-        <div class="field-card field-wide">
-          <div class="field-label">補鑽原因</div>
-          <select class="m3-select" id="m3-reason-type" onchange="onM3Select()">
+      <div class="m3-slots">
+        <div class="m3-slot">
+          <div class="m3-slot-title">指令組 1</div>
+          <div>
+            <div class="field-label" style="margin-bottom:6px">補鑽原因</div>
+            <select class="m3-select" id="m3-reason-type-1" onchange="onM3Select(1)">
             <option value="">— 請選擇補鑽原因 —</option>
             <option value="cs:refill_campaign_">活動獎勵沒有收到，補派鑽</option>
             <option value="cs:refill_gambling_">小遊戲結算異常，補派彩</option>
@@ -676,36 +715,75 @@
             <option value="cs:shill_livestream_">直播暗樁用途</option>
             <option value="cs:test_staff_">內部員工測試用鑽</option>
             <option value="cs:others_">其他</option>
-          </select>
-          <div id="m3-tag-badge" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text"></span></div>
-        </div>
-        <div class="field-card field-wide" style="position:relative">
-          <div class="field-label">Reason（原因說明，選填）</div>
-          <input class="field-input" id="m3-reason-extra" type="text" autocomplete="off"
-            oninput="onM3ReasonInput()"
-            onfocus="showReason3Dropdown()"
-            onblur="hideReason3Dropdown()">
-          <div id="reason3-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
-            <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
-            <div id="reason3-list"></div>
-            <div id="reason3-empty" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
+            </select>
+            <div id="m3-tag-badge-1" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-1"></span></div>
+          </div>
+          <div style="position:relative">
+            <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
+            <input class="field-input" id="m3-reason-extra-1" type="text" autocomplete="off"
+              oninput="onM3ReasonInput(1)"
+              onfocus="showReason3Dropdown(1)"
+              onblur="hideReason3Dropdown(1)">
+            <div id="reason3-dropdown-1" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+              <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
+              <div id="reason3-list-1"></div>
+              <div id="reason3-empty-1" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
+            </div>
+          </div>
+          <div id="m3-cmd-wrap-1" style="display:none">
+            <div class="cmd-box" style="margin-top:0">
+              <div class="cmd-label">jbot command</div>
+              <div class="cmd-text" id="cmd-display3-1">
+                <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <!-- 生成指令結果直接內嵌，不需額外按鈕 -->
-      <div id="m3-cmd-wrap" style="display:none;margin-top:12px">
-        <div class="section-heading" style="margin-bottom:8px">生成指令</div>
-        <div class="cmd-box">
-          <div class="cmd-label">jbot command</div>
-          <div class="cmd-text" id="cmd-display3">
-            <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
+        <div class="m3-slot">
+          <div class="m3-slot-title">指令組 2</div>
+          <div>
+            <div class="field-label" style="margin-bottom:6px">補鑽原因</div>
+            <select class="m3-select" id="m3-reason-type-2" onchange="onM3Select(2)">
+            <option value="">— 請選擇補鑽原因 —</option>
+            <option value="cs:refill_campaign_">活動獎勵沒有收到，補派鑽</option>
+            <option value="cs:refill_gambling_">小遊戲結算異常，補派彩</option>
+            <option value="cs:refund_gift_">送禮遇到異常的鑽石返還</option>
+            <option value="cs:comp_livestream_">觀看直播遇到異常的補償</option>
+            <option value="cs:comp_unlock_">觀看影片遇到異常的補償</option>
+            <option value="cs:comp_creator_revenue_">主播收益異常補償（bug 導致未收到收益）</option>
+            <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
+            <option value="cs:shill_livestream_">直播暗樁用途</option>
+            <option value="cs:test_staff_">內部員工測試用鑽</option>
+            <option value="cs:others_">其他</option>
+            </select>
+            <div id="m3-tag-badge-2" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-2"></span></div>
+          </div>
+          <div style="position:relative">
+            <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
+            <input class="field-input" id="m3-reason-extra-2" type="text" autocomplete="off"
+              oninput="onM3ReasonInput(2)"
+              onfocus="showReason3Dropdown(2)"
+              onblur="hideReason3Dropdown(2)">
+            <div id="reason3-dropdown-2" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+              <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
+              <div id="reason3-list-2"></div>
+              <div id="reason3-empty-2" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
+            </div>
+          </div>
+          <div id="m3-cmd-wrap-2" style="display:none">
+            <div class="cmd-box" style="margin-top:0">
+              <div class="cmd-label">jbot command</div>
+              <div class="cmd-text" id="cmd-display3-2">
+                <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Mode 2: Result panel -->
+    <!-- Mode 2: Result panel -->
   <div class="panel" id="result-section2" style="display:none">
     <div class="panel-header">
       <div class="panel-dot" style="background:var(--orange)"></div>
@@ -1179,8 +1257,8 @@ function hideReasonDropdown() {
   }, 180);
 }
 
-// ── Mode 3: 補鑽指令 ─────────────────────────────────────────────────────────
-var lastCmd3 = '';
+// ── Mode 3: 補鑽指令（雙組）────────────────────────────────────────────────────
+var lastCmd3 = ['', ''];  // slot 1 and 2
 var REASON3_KEY = 'jbot_reasons3_v1';
 
 function loadReason3Map() {
@@ -1199,90 +1277,83 @@ function saveReason3(v) {
   var map = loadReason3Map();
   map[v] = (map[v] || 0) + 1;
   localStorage.setItem(REASON3_KEY, JSON.stringify(map));
-  renderReason3List();
+  renderReason3List(1);
+  renderReason3List(2);
 }
 
-function renderReason3List() {
+function renderReason3List(n) {
   var list  = loadReasons3();
   var map   = loadReason3Map();
-  var el    = document.getElementById('reason3-list');
-  var empty = document.getElementById('reason3-empty');
+  var el    = document.getElementById('reason3-list-' + n);
+  var empty = document.getElementById('reason3-empty-' + n);
   if (!el) return;
   if (!list.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   el.innerHTML = list.map(function (r) {
     var count = map[r] || 0;
     var safe  = r.replace(/'/g, "\'").replace(/</g, '&lt;');
-    return '<div class="reason-item" onmousedown="pickReason3(event,\'' + safe + '\')">' +
+    return '<div class="reason-item" onmousedown="pickReason3(event,' + n + ',\'' + safe + '\')">' +
            '<span style="flex:1;font-size:13px;color:var(--text-primary)">' + esc(r) + '</span>' +
            '<span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">' + count + ' 次</span>' +
            '</div>';
   }).join('');
 }
 
-function pickReason3(e, v) {
+function pickReason3(e, n, v) {
   e.preventDefault();
-  var inp = document.getElementById('m3-reason-extra');
+  var inp = document.getElementById('m3-reason-extra-' + n);
   inp.value = v;
-  hideReason3Dropdown();
-  buildCmd3AndCopy();
+  hideReason3Dropdown(n);
+  buildCmd3AndCopy(n);
 }
 
-var reason3HideTimer = null;
+var reason3HideTimers = [null, null, null];
 
-function showReason3Dropdown() {
-  clearTimeout(reason3HideTimer);
-  renderReason3List();
-  var dd = document.getElementById('reason3-dropdown');
+function showReason3Dropdown(n) {
+  clearTimeout(reason3HideTimers[n]);
+  renderReason3List(n);
+  var dd = document.getElementById('reason3-dropdown-' + n);
   if (dd) dd.style.display = 'block';
 }
 
-function hideReason3Dropdown() {
-  reason3HideTimer = setTimeout(function () {
-    var dd = document.getElementById('reason3-dropdown');
+function hideReason3Dropdown(n) {
+  reason3HideTimers[n] = setTimeout(function () {
+    var dd = document.getElementById('reason3-dropdown-' + n);
     if (dd) dd.style.display = 'none';
   }, 180);
 }
 
-function onM3Select() {
-  var tag     = document.getElementById('m3-reason-type').value;
-  var badge   = document.getElementById('m3-tag-badge');
-  var tagText = document.getElementById('m3-tag-text');
+function onM3Select(n) {
+  var tag     = document.getElementById('m3-reason-type-' + n).value;
+  var badge   = document.getElementById('m3-tag-badge-' + n);
+  var tagText = document.getElementById('m3-tag-text-' + n);
   if (tag) {
     badge.style.display = 'block';
     tagText.textContent = tag;
-    buildCmd3AndCopy();
+    buildCmd3AndCopy(n);
   } else {
     badge.style.display = 'none';
-    document.getElementById('m3-cmd-wrap').style.display = 'none';
-    lastCmd3 = '';
+    document.getElementById('m3-cmd-wrap-' + n).style.display = 'none';
+    lastCmd3[n] = '';
   }
 }
 
-// Called on every keystroke in Reason extra field
-var reason3InputTimer = null;
-function onM3ReasonInput() {
-  clearTimeout(reason3InputTimer);
-  reason3InputTimer = setTimeout(function () {
-    buildCmd3AndCopy();
+var reason3InputTimers = [null, null, null];
+function onM3ReasonInput(n) {
+  clearTimeout(reason3InputTimers[n]);
+  reason3InputTimers[n] = setTimeout(function () {
+    buildCmd3AndCopy(n);
   }, 400);
 }
 
-function buildCmd3() {
-  var tag   = document.getElementById('m3-reason-type').value;
-  var extra = document.getElementById('m3-reason-extra').value.trim();
-  var display = document.getElementById('cmd-display3');
-  if (!display || !tag) { lastCmd3 = ''; return; }
+function buildCmd3(n) {
+  var tag   = document.getElementById('m3-reason-type-' + n).value;
+  var extra = document.getElementById('m3-reason-extra-' + n).value.trim();
+  var display = document.getElementById('cmd-display3-' + n);
+  if (!display || !tag) { lastCmd3[n] = ''; return; }
 
-  // If extra is empty, strip trailing underscore from tag
-  var reason;
-  if (extra) {
-    reason = tag + extra;          // cs:refill_campaign_ + 系統補派
-  } else {
-    reason = tag.replace(/_$/, ''); // cs:refill_campaign_ -> cs:refill_campaign
-  }
-
-  lastCmd3 = '@jbot-test deposit username/diamonds ' + reason;
+  var reason = extra ? tag + extra : tag.replace(/_$/, '');
+  lastCmd3[n] = '@jbot-test deposit username/diamonds ' + reason;
 
   display.innerHTML =
     '<span class="kw">@jbot-test deposit</span> ' +
@@ -1293,21 +1364,19 @@ function buildCmd3() {
     (extra ? '<span style="color:var(--text-secondary)">_</span><span style="color:var(--yellow)">' + esc(extra) + '</span>' : '');
 }
 
-function buildCmd3AndCopy() {
-  var tag = document.getElementById('m3-reason-type').value;
+function buildCmd3AndCopy(n) {
+  var tag = document.getElementById('m3-reason-type-' + n).value;
   if (!tag) return;
-  buildCmd3();
-  var wrap = document.getElementById('m3-cmd-wrap');
-  wrap.style.display = '';
-  var extra = document.getElementById('m3-reason-extra').value.trim();
+  buildCmd3(n);
+  document.getElementById('m3-cmd-wrap-' + n).style.display = '';
+  var extra = document.getElementById('m3-reason-extra-' + n).value.trim();
   if (extra) saveReason3(extra);
-  if (lastCmd3) {
-    doCopy(lastCmd3, function () {
+  if (lastCmd3[n]) {
+    doCopy(lastCmd3[n], function () {
       showToast('✓ 指令已自動複製到剪貼簿');
     });
   }
 }
-
 </script>
 </body>
 </html>
