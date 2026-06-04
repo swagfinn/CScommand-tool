@@ -458,6 +458,81 @@
   .m3-select:hover { border-color: #5a9af0; }
   .m3-select option { background: #1c2128; color: var(--text-primary); }
 
+  /* ── CP Lookup panel ── */
+  .cp-lookup-textarea {
+    width: 100%;
+    min-height: 72px;
+    max-height: 420px;
+    resize: none;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .cp-lookup-textarea::placeholder { color: var(--text-muted); }
+  .cp-lookup-textarea:focus { border-color: var(--orange); }
+
+  .cp-result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .cp-result-card {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    position: relative;
+  }
+  .cp-result-card:hover { border-color: var(--orange); background: #1e1608; }
+  .cp-result-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .cp-result-value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--orange);
+    word-break: break-all;
+  }
+  .cp-copy-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .cp-result-card .cp-copied-flash {
+    display: none;
+    position: absolute;
+    top: 6px; right: 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent-light);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+  .cp-result-card.flash .cp-copied-flash { display: block; }
+
   /* ── Mode 3 Reason input — styled as a visible box ── */
   .m3-reason-input {
     width: 100%;
@@ -682,6 +757,53 @@
     </div>
   </div>
 
+  <!-- Mode 2: CP Lookup panel -->
+  <div class="panel" id="panel-cp-lookup" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--orange)"></div>
+      <span class="panel-title">騙點申報快速篩</span>
+    </div>
+    <div class="panel-body">
+      <!-- Result grid always visible on top -->
+      <div class="cp-result-grid" id="cp-result-grid" style="margin-bottom:12px">
+        <div class="cp-result-card" id="cp-card-name" onclick="copyCpField('cp-val-name')">
+          <div class="cp-result-label">CP Name</div>
+          <div class="cp-result-value" id="cp-val-name">—</div>
+          <div class="cp-copy-hint">點擊複製</div>
+          <span class="cp-copied-flash">✓ 已複製</span>
+        </div>
+        <div class="cp-result-card" id="cp-card-company" onclick="copyCpField('cp-val-company')">
+          <div class="cp-result-label">Company</div>
+          <div class="cp-result-value" id="cp-val-company">—</div>
+          <div class="cp-copy-hint">點擊複製</div>
+          <span class="cp-copied-flash">✓ 已複製</span>
+        </div>
+        <div class="cp-result-card" id="cp-card-proj" onclick="copyCpField('cp-val-proj')">
+          <div class="cp-result-label">Project</div>
+          <div class="cp-result-value" id="cp-val-proj">—</div>
+          <div class="cp-copy-hint">點擊複製</div>
+          <span class="cp-copied-flash">✓ 已複製</span>
+        </div>
+        <div class="cp-result-card" id="cp-card-country" onclick="copyCpField('cp-val-country')">
+          <div class="cp-result-label">Country</div>
+          <div class="cp-result-value" id="cp-val-country">—</div>
+          <div class="cp-copy-hint">點擊複製</div>
+          <span class="cp-copied-flash">✓ 已複製</span>
+        </div>
+      </div>
+      <!-- Textarea below result cards -->
+      <div class="field-label" style="margin-bottom:6px">貼上主播資料</div>
+      <textarea
+        class="cp-lookup-textarea"
+        id="cp-raw-input"
+        spellcheck="false"
+        placeholder="將後台主播資料完整貼上…"
+        oninput="parseCpInfo(); autoResizeCpTextarea(this)"
+        rows="3"
+      ></textarea>
+    </div>
+  </div>
+
   <!-- Result panel -->
   <div class="panel" id="result-section">
     <div class="panel-header">
@@ -876,7 +998,8 @@ function switchMode(m) {
     t.setAttribute('aria-selected', String(+t.dataset.mode === m));
   });
   document.getElementById('panel-mode1').style.display  = m === 1 ? '' : 'none';
-  document.getElementById('panel-mode2').style.display  = m === 2 ? '' : 'none';
+  document.getElementById('panel-mode2').style.display      = m === 2 ? '' : 'none';
+  document.getElementById('panel-cp-lookup').style.display  = m === 2 ? '' : 'none';
   document.getElementById('panel-mode3').style.display  = m === 3 ? '' : 'none';
   var r1 = document.getElementById('result-section');
   if (m !== 1) r1.classList.remove('show');
@@ -1431,6 +1554,85 @@ function buildCmd3AndCopy(n) {
     });
   }
 }
+
+// ── CP Lookup ────────────────────────────────────────────────────────────────
+function parseCpInfo() {
+  var raw = document.getElementById('cp-raw-input').value;
+  if (!raw.trim()) {
+    // reset all fields to dash
+    ['cp-val-name','cp-val-company','cp-val-proj','cp-val-country'].forEach(function(id){
+      var el = document.getElementById(id); if(el) el.textContent = '\u2014';
+    });
+    return;
+  }
+
+  // CP Name: everything before "User ID:" literal
+  var cpName = null;
+  var uidRe = raw.search(/User\s*ID\s*:/i);
+  if (uidRe > 0) {
+    var before = raw.substring(0, uidRe).trim();
+    var tokens = before.split(/\s+/).filter(function(t){ return t.length > 0; });
+    if (tokens.length) cpName = tokens[tokens.length - 1];
+  }
+
+  // company: look for company:xxx in Tags
+  var compMatch = raw.match(/\bcompany:([^\s]+)/i);
+  var company = compMatch ? compMatch[1] : null;
+
+  // project: proj:xxx
+  var projMatch = raw.match(/\bproj:([^\s]+)/i);
+  var proj = projMatch ? 'proj:' + projMatch[1] : null;
+
+  // country: country:xx
+  var countryMatch = raw.match(/\bcountry:([^\s]+)/i);
+  var country = countryMatch ? countryMatch[1] : null;
+
+  function setField(elId, cardId, val) {
+    var el   = document.getElementById(elId);
+    var card = document.getElementById(cardId);
+    if (val) {
+      el.textContent = val;
+      el.className = 'cp-result-value';
+    } else {
+      el.textContent = '- none -';
+      el.className = 'cp-result-value';
+    }
+    card.style.cursor = 'pointer';
+    card.onclick = function () { copyCpField(elId); };
+  }
+
+  setField('cp-val-name',    'cp-card-name',    cpName);
+  setField('cp-val-company', 'cp-card-company', company);
+  setField('cp-val-proj',    'cp-card-proj',    proj);
+  setField('cp-val-country', 'cp-card-country', country);
+
+  // grid is always visible
+}
+
+var cpFlashTimers = {};
+function copyCpField(elId) {
+  var el  = document.getElementById(elId);
+  var txt = el.textContent;
+  if (!txt) return;
+  var card = el.closest('.cp-result-card');
+  doCopy(txt, function () {
+    showToast('\u2713 \u5df2\u8907\u88fd\uff1a' + txt);
+    if (card) {
+      card.classList.add('flash');
+      clearTimeout(cpFlashTimers[elId]);
+      cpFlashTimers[elId] = setTimeout(function () {
+        card.classList.remove('flash');
+      }, 1800);
+    }
+  });
+}
+
+
+function autoResizeCpTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 420) + 'px';
+}
+
 </script>
 </body>
 </html>
