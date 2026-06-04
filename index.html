@@ -393,6 +393,22 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* ── Panel header hint badge ── */
+  .hint-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    background: #0d1e0d;
+    color: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    padding: 2px 9px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
   /* ── Warning box (Paid:None) ── */
   .warn-box {
     background: #1c1200;
@@ -695,6 +711,7 @@
     <div class="panel-header">
       <div class="panel-dot"></div>
       <span class="panel-title">貼上訂單資訊</span>
+      <span class="hint-badge">cs:refill_purchase_</span>
     </div>
     <div class="panel-body">
       <textarea
@@ -717,6 +734,7 @@
     <div class="panel-header">
       <div class="panel-dot" style="background:var(--orange)"></div>
       <span class="panel-title">騙點補鑽 — 手動輸入</span>
+      <span class="hint-badge" style="background:#1e0d00;color:var(--orange);border-color:var(--orange)">cs:refund_creator_scam_</span>
     </div>
     <div class="panel-body">
       <div class="fields-grid">
@@ -753,6 +771,22 @@
       <div class="error-bar" id="error-bar2">
         <span>⚠</span>
         <span id="error-msg2"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode 2: Generated command result -->
+  <div class="panel" id="result-section2" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--orange)"></div>
+      <span class="panel-title">生成指令</span>
+    </div>
+    <div class="panel-body">
+      <div class="cmd-box">
+        <div class="cmd-label">jbot command</div>
+        <div class="cmd-text" id="cmd-display2">
+          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
+        </div>
       </div>
     </div>
   </div>
@@ -797,7 +831,7 @@
         class="cp-lookup-textarea"
         id="cp-raw-input"
         spellcheck="false"
-        placeholder="將後台主播資料完整貼上…"
+        placeholder="swag User ID: 57a42a779f22bb6bcc434520&#10;NoneCreated At:&#10;2016-08-05...&#10;Tags:&#10;owner:official signed location:tw company:swag country:tw"
         oninput="parseCpInfo(); autoResizeCpTextarea(this)"
         rows="3"
       ></textarea>
@@ -949,22 +983,7 @@
     </div>
   </div>
 
-    <!-- Mode 2: Result panel -->
-  <div class="panel" id="result-section2" style="display:none">
-    <div class="panel-header">
-      <div class="panel-dot" style="background:var(--orange)"></div>
-      <span class="panel-title">生成指令</span>
-    </div>
-    <div class="panel-body">
-      <div class="cmd-box">
-        <div class="cmd-label">jbot command</div>
-        <div class="cmd-text" id="cmd-display2">
-          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
-        </div>
 
-      </div>
-    </div>
-  </div>
 
 </main>
 
