@@ -520,7 +520,7 @@
           <div id="m2-amount-preview" style="font-size:11px;color:var(--accent-light);margin-top:5px;font-family:var(--font-mono);min-height:16px"></div>
         </div>
         <div class="field-card field-wide" style="position:relative">
-          <div class="field-label">Reason（原因說明）</div>
+          <div class="field-label">Reason（原因說明，選填）</div>
           <input class="field-input" id="m2-reason" type="text" autocomplete="off"
             oninput="buildCmd2()"
             onfocus="showReasonDropdown()"
@@ -868,7 +868,7 @@ function buildCmd2() {
   var reason = val('m2-reason');
   var display = document.getElementById('cmd-display2');
   if (!display) return;
-  if (!u || !cp || !amtRaw.trim() || !reason) {
+  if (!u || !cp || !amtRaw.trim()) {
     display.innerHTML = '<span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>';
     lastCmd2 = ''; return;
   }
@@ -877,13 +877,14 @@ function buildCmd2() {
     display.innerHTML = '<span class="cmd-placeholder">Amount 格式有誤…</span>';
     lastCmd2 = ''; return;
   }
-  lastCmd2 = '@jbot-test deposit ' + u + '/' + total + ' cs:refund_creator_scam_' + cp + '_' + reason;
+  var reasonSuffix = reason ? '_' + reason : '';
+  lastCmd2 = '@jbot-test deposit ' + u + '/' + total + ' cs:refund_creator_scam_' + cp + reasonSuffix;
   display.innerHTML =
     '<span class="kw">@jbot-test deposit</span> ' +
     '<span class="user">' + esc(u) + '</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + total + '</span> ' +
-    '<span class="rsn">cs:refund_creator_scam_' + esc(cp) + '_' + esc(reason) + '</span>';
+    '<span class="rsn">cs:refund_creator_scam_' + esc(cp) + (reason ? '_' + esc(reason) : '') + '</span>';
 }
 
 function generateScamCmd() {
@@ -898,7 +899,6 @@ function generateScamCmd() {
   if (!u)             missing.push('User Name');
   if (!cp)            missing.push('CP Name');
   if (!amtRaw.trim()) missing.push('Amount');
-  if (!reason)        missing.push('Reason');
   if (missing.length) { errMsg.textContent = '請填寫：' + missing.join('、'); errEl.classList.add('show'); return; }
 
   var total = parseAmounts(amtRaw);
