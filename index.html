@@ -393,6 +393,34 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* ── Warning box (Paid:None) ── */
+  .warn-box {
+    background: #1c1200;
+    border: 1px solid var(--yellow);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .warn-box.show { display: block; }
+  .warn-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yellow);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .warn-body {
+    font-size: 12px;
+    color: #d4b060;
+    line-height: 1.6;
+  }
+  .hl-red  { color: var(--red);    font-weight: 600; }
+  .hl-blue { color: var(--blue);   font-weight: 600; }
+
   /* ── Reason dropdown ── */
   .reason-item {
     display: flex;
@@ -405,6 +433,41 @@
   }
   .reason-item:last-child { border-bottom: none; }
   .reason-item:hover { background: var(--bg-hover); }
+
+  /* ── Mode 3 select ── */
+  .m3-select {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    transition: border-color 0.15s;
+  }
+  .m3-select:focus { border-color: var(--accent); }
+  .m3-select option { background: #1c2128; color: var(--text-primary); }
+
+  .tag-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--accent-bg);
+    color: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-top: 6px;
+  }
 
   /* ── Scroll to top ── */
   .scroll-top {
@@ -468,10 +531,10 @@
       <span>騙點補鑽</span>
       <span class="tab-chip">REWH 案件</span>
     </button>
-    <button class="tab" role="tab" aria-selected="false" disabled data-mode="3">
-      <span class="tab-icon">⚙️</span>
-      <span>模式 3</span>
-      <span class="tab-chip">即將推出</span>
+    <button class="tab" role="tab" aria-selected="false" data-mode="3">
+      <span class="tab-icon">📋</span>
+      <span>補鑽指令</span>
+      <span class="tab-chip">常用區</span>
     </button>
   </div>
 
@@ -549,6 +612,12 @@
       <span class="panel-title">擷取結果</span>
     </div>
     <div class="panel-body">
+      <!-- Warning: Paid:None case -->
+      <div class="warn-box" id="warn-no-paid">
+        <div class="warn-title">⚠ 沒 Paid Time</div>
+        <div class="warn-body">Paid: n/a，3rd Party 沒打交易成功 API）：打儲值指令 / 要填儲值表</div>
+      </div>
+
       <div class="section-heading">擷取欄位（可手動修改）</div>
       <div class="fields-grid">
         <div class="field-card">
@@ -563,13 +632,13 @@
           <div class="field-label">Order ID</div>
           <input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()">
         </div>
-        <div class="field-card">
+        <div class="field-card" id="field-gateway-wrap">
           <div class="field-label">Payment Gateway</div>
           <input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="buildCmd()">
         </div>
-        <div class="field-card">
+        <div class="field-card" id="field-reason-wrap">
           <div class="field-label">Reason 前綴（固定）</div>
-          <div class="field-static">cs:refill_purchase_</div>
+          <div class="field-static" id="f-reason-label">cs:refill_purchase_</div>
         </div>
       </div>
 
@@ -581,7 +650,57 @@
         <div class="cmd-text" id="cmd-display">
           <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
         </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Mode 3: 補鑽指令 -->
+  <div class="panel" id="panel-mode3" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--purple)"></div>
+      <span class="panel-title">補鑽指令 — 常用區</span>
+    </div>
+    <div class="panel-body">
+      <div class="fields-grid">
+        <div class="field-card field-wide">
+          <div class="field-label">補鑽原因</div>
+          <select class="m3-select" id="m3-reason-type" onchange="onM3Select()">
+            <option value="">— 請選擇補鑽原因 —</option>
+            <option value="cs:refill_campaign_">活動獎勵沒有收到，補派鑽</option>
+            <option value="cs:refill_gambling_">小遊戲結算異常，補派彩</option>
+            <option value="cs:refund_gift_">送禮遇到異常的鑽石返還</option>
+            <option value="cs:comp_livestream_">觀看直播遇到異常的補償</option>
+            <option value="cs:comp_unlock_">觀看影片遇到異常的補償</option>
+            <option value="cs:comp_creator_revenue_">主播收益異常補償（bug 導致未收到收益）</option>
+            <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
+            <option value="cs:shill_livestream_">直播暗樁用途</option>
+            <option value="cs:test_staff_">內部員工測試用鑽</option>
+            <option value="cs:others_">其他</option>
+          </select>
+          <div id="m3-tag-badge" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text"></span></div>
+        </div>
+        <div class="field-card field-wide" style="position:relative">
+          <div class="field-label">Reason（原因說明，選填）</div>
+          <input class="field-input" id="m3-reason-extra" type="text" autocomplete="off"
+            oninput="onM3ReasonInput()"
+            onfocus="showReason3Dropdown()"
+            onblur="hideReason3Dropdown()">
+          <div id="reason3-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
+            <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
+            <div id="reason3-list"></div>
+            <div id="reason3-empty" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
+          </div>
+        </div>
+      </div>
+      <!-- 生成指令結果直接內嵌，不需額外按鈕 -->
+      <div id="m3-cmd-wrap" style="display:none;margin-top:12px">
+        <div class="section-heading" style="margin-bottom:8px">生成指令</div>
+        <div class="cmd-box">
+          <div class="cmd-label">jbot command</div>
+          <div class="cmd-text" id="cmd-display3">
+            <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -636,10 +755,12 @@ function switchMode(m) {
   });
   document.getElementById('panel-mode1').style.display  = m === 1 ? '' : 'none';
   document.getElementById('panel-mode2').style.display  = m === 2 ? '' : 'none';
+  document.getElementById('panel-mode3').style.display  = m === 3 ? '' : 'none';
   var r1 = document.getElementById('result-section');
   if (m !== 1) r1.classList.remove('show');
   r1.style.display = m === 1 ? '' : 'none';
   if (m !== 2) document.getElementById('result-section2').style.display = 'none';
+
 }
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
@@ -698,27 +819,60 @@ function normalizeOrder(text) {
   return out;
 }
 
+// Returns 'none' string if paid is None, otherwise truthy string
+function extractPaid(text) {
+  var m = text.match(/^Paid:\s*(.+)/im);
+  if (!m) return null;
+  var v = m[1].split('\n')[0].trim();
+  return v;
+}
+
 function parseOrder() {
   var raw = normalizeOrder(document.getElementById('raw-input').value.trim());
   hideError();
   if (!raw) { showError('請先貼上訂單資訊'); return; }
 
   var username = matchToken(raw, /^Username:\s*(\S+)/m);
-  var gateway  = extractGateway(raw);
   var orderId  = extractOrderId(raw);
   var amount   = extractAmount(raw);
+  var paid     = extractPaid(raw);
+  var isPaidNone = !paid || paid.toLowerCase() === 'none';
 
   var missing = [];
   if (!username) missing.push('Username');
   if (!amount)   missing.push('Amount');
   if (!orderId)  missing.push('Order ID');
-  if (!gateway)  missing.push('Payment Gateway');
-
   if (missing.length) {
     showError('無法擷取：' + missing.join('、') + '，請確認格式是否正確');
     return;
   }
 
+  // --- Case 3: Paid:None -> special warning + dp command ---
+  if (isPaidNone) {
+    document.getElementById('warn-no-paid').classList.add('show');
+    document.getElementById('f-username').value = username;
+    document.getElementById('f-amount').value   = amount;
+    document.getElementById('f-orderid').value  = orderId;
+    document.getElementById('f-gateway').value  = '';
+    document.getElementById('field-gateway-wrap').style.opacity = '0.4';
+    document.getElementById('field-reason-wrap').style.opacity  = '0.4';
+    document.getElementById('result-section').classList.add('show');
+    buildCmdNoPaid(username, amount, orderId);
+    autoCopyCmdRaw(lastCmd);
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
+  // --- Case 1 & 2: Normal flow ---
+  var gateway = extractGateway(raw);
+  if (!gateway) {
+    showError('無法擷取：Payment Gateway，請確認格式是否正確');
+    return;
+  }
+
+  document.getElementById('warn-no-paid').classList.remove('show');
+  document.getElementById('field-gateway-wrap').style.opacity = '';
+  document.getElementById('field-reason-wrap').style.opacity  = '';
   document.getElementById('f-username').value = username;
   document.getElementById('f-amount').value   = amount;
   document.getElementById('f-orderid').value  = orderId;
@@ -739,6 +893,9 @@ function matchToken(text, regex) {
   var m = text.match(regex);
   if (!m) return null;
   var v = m[1].split(/\s/)[0].trim();
+  // Strip markdown link syntax [text](url) -> text
+  var linkMatch = v.match(/^\[([^\]]+)\]/);
+  if (linkMatch) v = linkMatch[1];
   return v === 'None' ? null : v;
 }
 
@@ -762,7 +919,7 @@ function extractAmount(text) {
 
 var KNOWN_GATEWAYS = [
   'happypay', 'xenopay', 'epoint', 'paydollar', 'newebpay',
-  'ecpay', 'linepay', 'jkopay', 'creditcard', 'atm'
+  'ecpay', 'linepay', 'jkopay', 'creditcard', 'atm', 'pay168'
 ];
 
 function extractGateway(text) {
@@ -791,6 +948,28 @@ function buildCmd() {
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + esc(a) + '</span> ' +
     '<span class="rsn">cs:refill_purchase_' + esc(g) + '_' + esc(o) + '</span>';
+}
+
+function buildCmdNoPaid(u, a, o) {
+  var display = document.getElementById('cmd-display');
+  // Format: @jbot-test dp USERNAME/AMOUNT USD paymentgateway-refill-ORDERID
+  lastCmd = '@jbot-test dp ' + u + '/' + a + ' USD paymentgateway-refill-' + o;
+  display.innerHTML =
+    '<span class="kw">@jbot-test dp</span> ' +
+    '<span class="user">' + esc(u) + '</span>' +
+    '<span style="color:var(--text-secondary)">/</span>' +
+    '<span class="amt">' + esc(a) + '</span> ' +
+    '<span class="hl-red">USD</span> ' +
+    '<span class="hl-blue">paymentgateway</span>' +
+    '<span style="color:var(--text-secondary)">-refill-</span>' +
+    '<span class="rsn">' + esc(o) + '</span>';
+}
+
+function autoCopyCmdRaw(cmd) {
+  if (!cmd) return;
+  doCopy(cmd, function () {
+    showToast('✓ 指令已自動複製到剪貼簿');
+  });
 }
 
 function autoCopyCmd() {
@@ -999,6 +1178,136 @@ function hideReasonDropdown() {
     if (dd) dd.style.display = 'none';
   }, 180);
 }
+
+// ── Mode 3: 補鑽指令 ─────────────────────────────────────────────────────────
+var lastCmd3 = '';
+var REASON3_KEY = 'jbot_reasons3_v1';
+
+function loadReason3Map() {
+  try { return JSON.parse(localStorage.getItem(REASON3_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
+
+function loadReasons3() {
+  var map = loadReason3Map();
+  return Object.keys(map).sort(function (a, b) { return map[b] - map[a]; }).slice(0, 8);
+}
+
+function saveReason3(v) {
+  v = v.trim();
+  if (!v) return;
+  var map = loadReason3Map();
+  map[v] = (map[v] || 0) + 1;
+  localStorage.setItem(REASON3_KEY, JSON.stringify(map));
+  renderReason3List();
+}
+
+function renderReason3List() {
+  var list  = loadReasons3();
+  var map   = loadReason3Map();
+  var el    = document.getElementById('reason3-list');
+  var empty = document.getElementById('reason3-empty');
+  if (!el) return;
+  if (!list.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  el.innerHTML = list.map(function (r) {
+    var count = map[r] || 0;
+    var safe  = r.replace(/'/g, "\'").replace(/</g, '&lt;');
+    return '<div class="reason-item" onmousedown="pickReason3(event,\'' + safe + '\')">' +
+           '<span style="flex:1;font-size:13px;color:var(--text-primary)">' + esc(r) + '</span>' +
+           '<span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">' + count + ' 次</span>' +
+           '</div>';
+  }).join('');
+}
+
+function pickReason3(e, v) {
+  e.preventDefault();
+  var inp = document.getElementById('m3-reason-extra');
+  inp.value = v;
+  hideReason3Dropdown();
+  buildCmd3AndCopy();
+}
+
+var reason3HideTimer = null;
+
+function showReason3Dropdown() {
+  clearTimeout(reason3HideTimer);
+  renderReason3List();
+  var dd = document.getElementById('reason3-dropdown');
+  if (dd) dd.style.display = 'block';
+}
+
+function hideReason3Dropdown() {
+  reason3HideTimer = setTimeout(function () {
+    var dd = document.getElementById('reason3-dropdown');
+    if (dd) dd.style.display = 'none';
+  }, 180);
+}
+
+function onM3Select() {
+  var tag     = document.getElementById('m3-reason-type').value;
+  var badge   = document.getElementById('m3-tag-badge');
+  var tagText = document.getElementById('m3-tag-text');
+  if (tag) {
+    badge.style.display = 'block';
+    tagText.textContent = tag;
+    buildCmd3AndCopy();
+  } else {
+    badge.style.display = 'none';
+    document.getElementById('m3-cmd-wrap').style.display = 'none';
+    lastCmd3 = '';
+  }
+}
+
+// Called on every keystroke in Reason extra field
+var reason3InputTimer = null;
+function onM3ReasonInput() {
+  clearTimeout(reason3InputTimer);
+  reason3InputTimer = setTimeout(function () {
+    buildCmd3AndCopy();
+  }, 400);
+}
+
+function buildCmd3() {
+  var tag   = document.getElementById('m3-reason-type').value;
+  var extra = document.getElementById('m3-reason-extra').value.trim();
+  var display = document.getElementById('cmd-display3');
+  if (!display || !tag) { lastCmd3 = ''; return; }
+
+  // If extra is empty, strip trailing underscore from tag
+  var reason;
+  if (extra) {
+    reason = tag + extra;          // cs:refill_campaign_ + 系統補派
+  } else {
+    reason = tag.replace(/_$/, ''); // cs:refill_campaign_ -> cs:refill_campaign
+  }
+
+  lastCmd3 = '@jbot-test deposit username/diamonds ' + reason;
+
+  display.innerHTML =
+    '<span class="kw">@jbot-test deposit</span> ' +
+    '<span class="user">username</span>' +
+    '<span style="color:var(--text-secondary)">/</span>' +
+    '<span class="amt">diamonds</span> ' +
+    '<span class="rsn">' + esc(tag.replace(/_$/, '')) + '</span>' +
+    (extra ? '<span style="color:var(--text-secondary)">_</span><span style="color:var(--yellow)">' + esc(extra) + '</span>' : '');
+}
+
+function buildCmd3AndCopy() {
+  var tag = document.getElementById('m3-reason-type').value;
+  if (!tag) return;
+  buildCmd3();
+  var wrap = document.getElementById('m3-cmd-wrap');
+  wrap.style.display = '';
+  var extra = document.getElementById('m3-reason-extra').value.trim();
+  if (extra) saveReason3(extra);
+  if (lastCmd3) {
+    doCopy(lastCmd3, function () {
+      showToast('✓ 指令已自動複製到剪貼簿');
+    });
+  }
+}
+
 </script>
 </body>
 </html>
