@@ -458,6 +458,46 @@
   .m3-select:hover { border-color: #5a9af0; }
   .m3-select option { background: #1c2128; color: var(--text-primary); }
 
+  /* ── Mode 3 Reason input — styled as a visible box ── */
+  .m3-reason-input {
+    width: 100%;
+    background: #0d1117;
+    border: 1.5px solid #3b6fd4;
+    border-radius: 7px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 11px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+  }
+  .m3-reason-input::placeholder { color: var(--text-muted); font-style: italic; font-size: 12px; }
+  .m3-reason-input:focus {
+    border-color: #79c0ff;
+    box-shadow: 0 0 0 3px rgba(121,192,255,0.12);
+  }
+
+  /* ── Mode 3 cmd-box: copied state indicator ── */
+  .m3-cmd-box { position: relative; }
+  .m3-copied-badge {
+    display: none;
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    color: var(--accent-light);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 5px;
+    font-family: var(--font-ui);
+    letter-spacing: 0.03em;
+    pointer-events: none;
+  }
+  .m3-copied-badge.show { display: block; }
+
   /* ── Mode 3 dual slot layout ── */
   .m3-slots {
     display: grid;
@@ -720,7 +760,8 @@
           </div>
           <div style="position:relative">
             <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
-            <input class="field-input" id="m3-reason-extra-1" type="text" autocomplete="off"
+            <input class="m3-reason-input" id="m3-reason-extra-1" type="text" autocomplete="off"
+              placeholder="輸入原因說明（選填）…"
               oninput="onM3ReasonInput(1)"
               onfocus="showReason3Dropdown(1)"
               onblur="hideReason3Dropdown(1)">
@@ -731,11 +772,12 @@
             </div>
           </div>
           <div id="m3-cmd-wrap-1" style="display:none">
-            <div class="cmd-box" style="margin-top:0">
+            <div class="cmd-box m3-cmd-box" style="margin-top:0">
               <div class="cmd-label">jbot command</div>
-              <div class="cmd-text" id="cmd-display3-1">
+              <div class="cmd-text" id="cmd-display3-1" style="padding-right:88px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
+              <span class="m3-copied-badge" id="m3-copied-badge-1">✓ 已複製</span>
             </div>
           </div>
         </div>
@@ -760,7 +802,8 @@
           </div>
           <div style="position:relative">
             <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
-            <input class="field-input" id="m3-reason-extra-2" type="text" autocomplete="off"
+            <input class="m3-reason-input" id="m3-reason-extra-2" type="text" autocomplete="off"
+              placeholder="輸入原因說明（選填）…"
               oninput="onM3ReasonInput(2)"
               onfocus="showReason3Dropdown(2)"
               onblur="hideReason3Dropdown(2)">
@@ -771,11 +814,12 @@
             </div>
           </div>
           <div id="m3-cmd-wrap-2" style="display:none">
-            <div class="cmd-box" style="margin-top:0">
+            <div class="cmd-box m3-cmd-box" style="margin-top:0">
               <div class="cmd-label">jbot command</div>
-              <div class="cmd-text" id="cmd-display3-2">
+              <div class="cmd-text" id="cmd-display3-2" style="padding-right:88px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
+              <span class="m3-copied-badge" id="m3-copied-badge-2">✓ 已複製</span>
             </div>
           </div>
         </div>
@@ -1364,6 +1408,8 @@ function buildCmd3(n) {
     (extra ? '<span style="color:var(--text-secondary)">_</span><span style="color:var(--yellow)">' + esc(extra) + '</span>' : '');
 }
 
+var m3BadgeTimers = [null, null, null];
+
 function buildCmd3AndCopy(n) {
   var tag = document.getElementById('m3-reason-type-' + n).value;
   if (!tag) return;
@@ -1374,6 +1420,14 @@ function buildCmd3AndCopy(n) {
   if (lastCmd3[n]) {
     doCopy(lastCmd3[n], function () {
       showToast('✓ 指令已自動複製到剪貼簿');
+      var badge = document.getElementById('m3-copied-badge-' + n);
+      if (badge) {
+        badge.classList.add('show');
+        clearTimeout(m3BadgeTimers[n]);
+        m3BadgeTimers[n] = setTimeout(function () {
+          badge.classList.remove('show');
+        }, 2500);
+      }
     });
   }
 }
