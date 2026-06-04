@@ -406,6 +406,31 @@
   .reason-item:last-child { border-bottom: none; }
   .reason-item:hover { background: var(--bg-hover); }
 
+  /* ── Scroll to top ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 1.75rem;
+    right: 1.75rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, background 0.15s, transform 0.15s;
+    z-index: 200;
+  }
+  .scroll-top.visible { opacity: 1; pointer-events: auto; }
+  .scroll-top:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateY(-2px); }
+  .scroll-top:active { transform: scale(0.93); }
+
   /* ── Footer ── */
   .footer {
     margin-top: 2.5rem;
@@ -497,7 +522,7 @@
         <div class="field-card field-wide" style="position:relative">
           <div class="field-label">Reason（原因說明）</div>
           <input class="field-input" id="m2-reason" type="text" autocomplete="off"
-            oninput="buildCmd2(); saveReason(this.value)"
+            oninput="buildCmd2()"
             onfocus="showReasonDropdown()"
             onblur="hideReasonDropdown()">
           <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
@@ -556,10 +581,7 @@
         <div class="cmd-text" id="cmd-display">
           <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
         </div>
-        <button class="copy-btn" id="copy-btn" onclick="copyCmd()">
-          <span id="copy-icon">📋</span>
-          <span id="copy-label">複製</span>
-        </button>
+
       </div>
     </div>
   </div>
@@ -576,10 +598,7 @@
         <div class="cmd-text" id="cmd-display2">
           <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
         </div>
-        <button class="copy-btn" id="copy-btn2" onclick="copyCmd2()">
-          <span id="copy-icon2">📋</span>
-          <span id="copy-label2">複製</span>
-        </button>
+
       </div>
     </div>
   </div>
@@ -587,6 +606,8 @@
 </main>
 
 <div class="toast" id="toast">✓ 已複製到剪貼簿</div>
+
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
 
 <footer class="footer">Swag Live · 客服內部工具 · 僅供內部使用</footer>
 
@@ -598,6 +619,10 @@ document.addEventListener('DOMContentLoaded', function () {
       if (btn.disabled) return;
       switchMode(+btn.dataset.mode);
     });
+  });
+  window.addEventListener('scroll', function () {
+    var btn = document.getElementById('scroll-top');
+    if (btn) btn.classList.toggle('visible', window.scrollY > 200);
   });
 });
 
@@ -614,7 +639,7 @@ function switchMode(m) {
   var r1 = document.getElementById('result-section');
   if (m !== 1) r1.classList.remove('show');
   r1.style.display = m === 1 ? '' : 'none';
-  document.getElementById('result-section2').style.display = m === 2 ? '' : 'none';
+  if (m !== 2) document.getElementById('result-section2').style.display = 'none';
 }
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
@@ -771,16 +796,7 @@ function buildCmd() {
 function autoCopyCmd() {
   if (!lastCmd) return;
   doCopy(lastCmd, function () {
-    var btn = document.getElementById('copy-btn');
-    btn.classList.add('copied');
-    document.getElementById('copy-icon').textContent  = '✓';
-    document.getElementById('copy-label').textContent = '已複製！';
     showToast('✓ 指令已自動複製到剪貼簿');
-    setTimeout(function () {
-      btn.classList.remove('copied');
-      document.getElementById('copy-icon').textContent  = '📋';
-      document.getElementById('copy-label').textContent = '複製';
-    }, 3000);
   });
 }
 
@@ -898,16 +914,7 @@ function generateScamCmd() {
 function autoCopyCmd2() {
   if (!lastCmd2) return;
   doCopy(lastCmd2, function () {
-    var btn = document.getElementById('copy-btn2');
-    btn.classList.add('copied');
-    document.getElementById('copy-icon2').textContent  = '✓';
-    document.getElementById('copy-label2').textContent = '已複製！';
     showToast('✓ 指令已自動複製到剪貼簿');
-    setTimeout(function () {
-      btn.classList.remove('copied');
-      document.getElementById('copy-icon2').textContent  = '📋';
-      document.getElementById('copy-label2').textContent = '複製';
-    }, 3000);
   });
 }
 
@@ -927,36 +934,44 @@ function copyCmd2() {
   });
 }
 
-// ── Reason history ───────────────────────────────────────────────────────────
-var REASON_KEY = 'jbot_reasons_v1';
+// ── Reason history (frequency-sorted, top 8) ────────────────────────────────
+var REASON_KEY = 'jbot_reasons_v2';
+
+function loadReasonMap() {
+  try { return JSON.parse(localStorage.getItem(REASON_KEY) || '{}'); }
+  catch (e) { return {}; }
+}
 
 function loadReasons() {
-  try { return JSON.parse(localStorage.getItem(REASON_KEY) || '[]'); }
-  catch (e) { return []; }
+  var map = loadReasonMap();
+  return Object.keys(map)
+    .sort(function (a, b) { return map[b] - map[a]; })
+    .slice(0, 8);
 }
 
 function saveReason(v) {
   v = v.trim();
   if (!v) return;
-  var list = loadReasons().filter(function (r) { return r !== v; });
-  list.unshift(v);
-  if (list.length > 8) list = list.slice(0, 8);
-  localStorage.setItem(REASON_KEY, JSON.stringify(list));
+  var map = loadReasonMap();
+  map[v] = (map[v] || 0) + 1;
+  localStorage.setItem(REASON_KEY, JSON.stringify(map));
   renderReasonList();
 }
 
 function renderReasonList() {
   var list  = loadReasons();
+  var map   = loadReasonMap();
   var el    = document.getElementById('reason-list');
   var empty = document.getElementById('reason-empty');
   if (!el) return;
   if (!list.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  el.innerHTML = list.map(function (r, i) {
-    var safe = r.replace(/'/g, "\\'").replace(/</g, '&lt;');
+  el.innerHTML = list.map(function (r) {
+    var count = map[r] || 0;
+    var safe  = r.replace(/'/g, "\'").replace(/</g, '&lt;');
     return '<div class="reason-item" onmousedown="pickReason(event,\'' + safe + '\')">' +
-           '<span style="font-size:10px;color:var(--text-muted);min-width:14px;font-family:var(--font-mono)">' + (i + 1) + '</span>' +
            '<span style="flex:1;font-size:13px;color:var(--text-primary)">' + esc(r) + '</span>' +
+           '<span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);white-space:nowrap">' + count + ' 次</span>' +
            '</div>';
   }).join('');
 }
