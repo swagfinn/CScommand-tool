@@ -9,667 +9,123 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg-page:     #0e1117;
-    --bg-panel:    #161b22;
-    --bg-input:    #0d1117;
-    --bg-card:     #1c2128;
-    --bg-hover:    #21262d;
-    --border:      #30363d;
-    --border-light:#21262d;
-    --text-primary:#e6edf3;
-    --text-secondary:#8b949e;
-    --text-muted:  #484f58;
-    --accent:      #1a7f5a;
-    --accent-light:#56d364;
-    --accent-bg:   #0d2818;
-    --accent-hover:#2ea043;
-    --blue:        #79c0ff;
-    --orange:      #ffa657;
-    --green:       #7ee787;
-    --purple:      #d2a8ff;
-    --yellow:      #e3b341;
-    --red:         #f85149;
-    --font-ui: 'Noto Sans TC', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    --bg-page:#0e1117; --bg-panel:#161b22; --bg-input:#0d1117; --bg-card:#1c2128; --bg-hover:#21262d;
+    --border:#30363d; --border-light:#21262d;
+    --text-primary:#e6edf3; --text-secondary:#8b949e; --text-muted:#484f58;
+    --accent:#1a7f5a; --accent-light:#56d364; --accent-bg:#0d2818; --accent-hover:#2ea043;
+    --blue:#79c0ff; --orange:#ffa657; --green:#7ee787; --purple:#d2a8ff; --yellow:#e3b341; --red:#f85149;
+    --font-ui:'Noto Sans TC',sans-serif; --font-mono:'JetBrains Mono',monospace;
   }
-
-  body {
-    font-family: var(--font-ui);
-    background: var(--bg-page);
-    color: var(--text-primary);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem 4rem;
-  }
-
-  /* ── Header ── */
-  .app-header {
-    width: 100%;
-    max-width: 720px;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .app-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: var(--accent-bg);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .app-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.01em;
-  }
-  .app-sub {
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-  }
-  .version-badge {
-    font-size: 11px;
-    font-family: var(--font-mono);
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    padding: 4px 10px;
-    border-radius: 20px;
-    align-self: center;
-  }
-
-  /* ── Main container ── */
-  .container {
-    width: 100%;
-    max-width: 720px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  /* ── Mode tabs ── */
-  .mode-tabs {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px;
-  }
-  .tab {
-    padding: 10px 8px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    background: transparent;
-    color: var(--text-secondary);
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    line-height: 1.3;
-  }
-  .tab .tab-icon { font-size: 16px; }
-  .tab:hover:not(.active):not(:disabled) { background: var(--bg-hover); color: var(--text-primary); }
-  .tab.active {
-    background: var(--accent-bg);
-    border-color: var(--accent);
-    color: var(--accent-light);
-  }
-  .tab:disabled { opacity: 0.35; cursor: not-allowed; }
-  .tab .tab-chip {
-    font-size: 10px;
-    background: var(--bg-hover);
-    color: var(--text-muted);
-    padding: 1px 6px;
-    border-radius: 10px;
-    font-family: var(--font-mono);
-  }
-  .tab.active .tab-chip {
-    background: var(--accent);
-    color: #fff;
-  }
-
-  /* ── Panel ── */
-  .panel {
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .panel-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border-light);
-    background: var(--bg-card);
-  }
-  .panel-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .panel-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent-light);
-  }
-  .panel-body { padding: 16px; }
-
-  /* ── Textarea ── */
-  textarea {
-    width: 100%;
-    min-height: 210px;
-    resize: vertical;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.7;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  textarea::placeholder { color: var(--text-muted); }
-  textarea:focus { border-color: var(--accent); }
-
-  /* ── Parse button ── */
-  .parse-btn {
-    width: 100%;
-    margin-top: 10px;
-    padding: 11px 16px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background 0.15s, transform 0.1s;
-    letter-spacing: 0.01em;
-  }
-  .parse-btn:hover { background: var(--accent-hover); }
-  .parse-btn:active { transform: scale(0.99); }
-
-  /* ── Error ── */
-  .error-bar {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    background: #2d1117;
-    border: 1px solid #6d1a1a;
-    color: #f85149;
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13px;
-    margin-top: 10px;
-  }
-  .error-bar.show { display: flex; }
-
-  /* ── Fields grid ── */
-  .fields-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .field-wide { grid-column: 1 / -1; }
-
-  .field-card {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-  }
-  .field-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-  .field-input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    border-bottom: 1px dashed var(--border);
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 2px 0 4px;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  .field-input:focus { border-bottom-color: var(--accent-light); }
-  .field-static {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: var(--purple);
-    padding: 2px 0;
-  }
-
-  /* ── Command output ── */
-  .cmd-box {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    position: relative;
-  }
-  .cmd-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .cmd-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border-light);
-  }
-  .cmd-text {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.7;
-    color: var(--text-secondary);
-    word-break: break-all;
-    padding-right: 80px;
-  }
-  .cmd-text .kw   { color: var(--blue); font-weight: 600; }
-  .cmd-text .user { color: var(--orange); }
-  .cmd-text .amt  { color: var(--green); font-weight: 600; }
-  .cmd-text .rsn  { color: var(--purple); }
-  .cmd-placeholder { color: var(--text-muted); font-style: italic; }
-
-  .copy-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: var(--bg-hover);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-family: var(--font-ui);
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.15s;
-  }
-  .copy-btn:hover { background: var(--border); color: var(--text-primary); }
-  .copy-btn.copied {
-    background: var(--accent-bg);
-    border-color: var(--accent);
-    color: var(--accent-light);
-  }
-
-  /* ── Section heading ── */
-  .section-heading {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .section-heading::before {
-    content: '';
-    display: inline-block;
-    width: 3px; height: 12px;
-    background: var(--accent);
-    border-radius: 2px;
-  }
-
-  /* ── Result section ── */
-  #result-section { display: none; }
-  #result-section.show { display: block; }
-
-  .divider { height: 1px; background: var(--border-light); margin: 1rem 0; }
-
-  /* ── Toast ── */
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--bg-card);
-    border: 1px solid var(--accent);
-    color: var(--accent-light);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    opacity: 0;
-    transition: all 0.25s;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* ── Panel header hint badge ── */
-  .hint-badge {
-    display: inline-flex;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
-    background: #0d1e0d;
-    color: var(--accent-light);
-    border: 1px solid var(--accent);
-    border-radius: 5px;
-    padding: 2px 9px;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-  }
-
-  /* ── Warning box (Paid:None) ── */
-  .warn-box {
-    background: #1c1200;
-    border: 1px solid var(--yellow);
-    border-radius: 8px;
-    padding: 12px 14px;
-    margin-bottom: 12px;
-    display: none;
-  }
-  .warn-box.show { display: block; }
-  .warn-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--yellow);
-    letter-spacing: 0.04em;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .warn-body {
-    font-size: 12px;
-    color: #d4b060;
-    line-height: 1.6;
-  }
-  .hl-red  { color: var(--red);    font-weight: 600; }
-  .hl-blue { color: var(--blue);   font-weight: 600; }
-
-  /* ── Reason dropdown ── */
-  .reason-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    cursor: pointer;
-    transition: background 0.1s;
-    border-bottom: 0.5px solid var(--border-light);
-  }
-  .reason-item:last-child { border-bottom: none; }
-  .reason-item:hover { background: var(--bg-hover); }
-
-  /* ── Mode 3 select ── */
-  .m3-select {
-    width: 100%;
-    background: #1a2744;
-    border: 1.5px solid #3b6fd4;
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-family: var(--font-ui);
-    font-size: 14px;
-    padding: 10px 14px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2379c0ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-    transition: border-color 0.15s, background 0.15s;
-  }
-  .m3-select:focus { border-color: #79c0ff; background: #1e2f52; }
-  .m3-select:hover { border-color: #5a9af0; }
-  .m3-select option { background: #1c2128; color: var(--text-primary); }
-
-  /* ── CP Lookup panel ── */
-  .cp-lookup-textarea {
-    width: 100%;
-    min-height: 72px;
-    max-height: 420px;
-    resize: none;
-    overflow-y: auto;
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    line-height: 1.6;
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color 0.15s;
-    box-sizing: border-box;
-  }
-  .cp-lookup-textarea::placeholder { color: var(--text-muted); }
-  .cp-lookup-textarea:focus { border-color: var(--orange); }
-
-  .cp-result-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  .cp-result-card {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 9px 12px;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-    position: relative;
-  }
-  .cp-result-card:hover { border-color: var(--orange); background: #1e1608; }
-  .cp-result-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-  .cp-result-value {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--orange);
-    word-break: break-all;
-  }
-  .cp-copy-hint {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 3px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .cp-result-card .cp-copied-flash {
-    display: none;
-    position: absolute;
-    top: 6px; right: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--accent-light);
-    background: var(--accent-bg);
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 2px 7px;
-  }
-  .cp-result-card.flash .cp-copied-flash { display: block; }
-
-  /* ── Mode 3 Reason input — styled as a visible box ── */
-  .m3-reason-input {
-    width: 100%;
-    background: #0d1117;
-    border: 1.5px solid #3b6fd4;
-    border-radius: 7px;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 11px;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    box-sizing: border-box;
-  }
-  .m3-reason-input::placeholder { color: var(--text-muted); font-style: italic; font-size: 12px; }
-  .m3-reason-input:focus {
-    border-color: #79c0ff;
-    box-shadow: 0 0 0 3px rgba(121,192,255,0.12);
-  }
-
-  /* ── Mode 3 cmd-box: copied state indicator ── */
-  .m3-cmd-box { position: relative; }
-  .m3-copied-badge {
-    display: none;
-    position: absolute;
-    top: 10px; right: 10px;
-    background: var(--accent-bg);
-    border: 1px solid var(--accent);
-    color: var(--accent-light);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 5px;
-    font-family: var(--font-ui);
-    letter-spacing: 0.03em;
-    pointer-events: none;
-  }
-  .m3-copied-badge.show { display: block; }
-
-  /* ── Mode 3 dual slot layout ── */
-  .m3-slots {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-  @media (max-width: 600px) {
-    .m3-slots { grid-template-columns: 1fr; }
-  }
-  .m3-slot {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .m3-slot-title {
-    font-size: 11px;
-    font-weight: 600;
-    color: #7c8ea6;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .m3-slot-title::before {
-    content: '';
-    display: inline-block;
-    width: 3px; height: 11px;
-    background: var(--purple);
-    border-radius: 2px;
-  }
-
-  .tag-badge {
-    display: inline-block;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    background: var(--accent-bg);
-    color: var(--accent-light);
-    border: 1px solid var(--accent);
-    border-radius: 4px;
-    padding: 2px 8px;
-    margin-top: 6px;
-  }
-
-  /* ── Scroll to top ── */
-  .scroll-top {
-    position: fixed;
-    bottom: 1.75rem;
-    right: 1.75rem;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s, background 0.15s, transform 0.15s;
-    z-index: 200;
-  }
-  .scroll-top.visible { opacity: 1; pointer-events: auto; }
-  .scroll-top:hover { background: var(--bg-hover); color: var(--text-primary); transform: translateY(-2px); }
-  .scroll-top:active { transform: scale(0.93); }
-
-  /* ── Footer ── */
-  .footer {
-    margin-top: 2.5rem;
-    font-size: 11px;
-    color: var(--text-muted);
-    text-align: center;
-    font-family: var(--font-mono);
-  }
+  body { font-family:var(--font-ui); background:var(--bg-page); color:var(--text-primary); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:2rem 1rem 4rem; }
+  .app-header { width:100%; max-width:720px; margin-bottom:2rem; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+  .app-logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon { width:36px; height:36px; background:var(--accent-bg); border:1px solid var(--accent); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .app-name { font-size:18px; font-weight:600; color:var(--text-primary); letter-spacing:-0.01em; }
+  .app-sub { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+  .version-badge { font-size:11px; font-family:var(--font-mono); background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); padding:4px 10px; border-radius:20px; align-self:center; }
+  .container { width:100%; max-width:720px; display:flex; flex-direction:column; gap:1rem; }
+  .mode-tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; padding:8px; }
+  .tab { padding:10px 8px; border-radius:8px; border:1px solid transparent; background:transparent; color:var(--text-secondary); font-family:var(--font-ui); font-size:13px; font-weight:500; cursor:pointer; text-align:center; transition:all 0.15s; display:flex; flex-direction:column; align-items:center; gap:4px; line-height:1.3; }
+  .tab .tab-icon { font-size:16px; }
+  .tab:hover:not(.active):not(:disabled) { background:var(--bg-hover); color:var(--text-primary); }
+  .tab.active { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-light); }
+  .tab:disabled { opacity:.35; cursor:not-allowed; }
+  .tab .tab-chip { font-size:10px; background:var(--bg-hover); color:var(--text-muted); padding:1px 6px; border-radius:10px; font-family:var(--font-mono); }
+  .tab.active .tab-chip { background:var(--accent); color:#fff; }
+  .panel { background:var(--bg-panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .panel-header { display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border-light); background:var(--bg-card); }
+  .panel-title { font-size:13px; font-weight:500; color:var(--text-secondary); letter-spacing:.04em; text-transform:uppercase; }
+  .panel-dot { width:6px; height:6px; border-radius:50%; background:var(--accent-light); }
+  .panel-body { padding:16px; }
+  textarea { width:100%; min-height:210px; resize:vertical; font-family:var(--font-mono); font-size:12px; line-height:1.7; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:12px 14px; color:var(--text-primary); outline:none; transition:border-color 0.15s; }
+  textarea::placeholder { color:var(--text-muted); }
+  textarea:focus { border-color:var(--accent); }
+  .parse-btn { width:100%; margin-top:10px; padding:11px 16px; background:var(--accent); color:#fff; border:none; border-radius:8px; font-family:var(--font-ui); font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background 0.15s,transform 0.1s; letter-spacing:.01em; }
+  .parse-btn:hover { background:var(--accent-hover); }
+  .parse-btn:active { transform:scale(.99); }
+  .error-bar { display:none; align-items:center; gap:8px; background:#2d1117; border:1px solid #6d1a1a; color:#f85149; border-radius:8px; padding:10px 14px; font-size:13px; margin-top:10px; }
+  .error-bar.show { display:flex; }
+  .fields-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .field-wide { grid-column:1/-1; }
+  .field-card { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+  .field-label { font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+  .field-input { width:100%; background:transparent; border:none; border-bottom:1px dashed var(--border); color:var(--text-primary); font-family:var(--font-mono); font-size:13px; font-weight:500; padding:2px 0 4px; outline:none; transition:border-color 0.15s; }
+  .field-input:focus { border-bottom-color:var(--accent-light); }
+  .field-static { font-family:var(--font-mono); font-size:12px; color:var(--purple); padding:2px 0; }
+  .cmd-box { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:14px 16px; position:relative; }
+  .cmd-label { font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .cmd-label::after { content:''; flex:1; height:1px; background:var(--border-light); }
+  .cmd-text { font-family:var(--font-mono); font-size:13px; line-height:1.7; color:var(--text-secondary); word-break:break-all; padding-right:80px; }
+  .cmd-text .kw { color:var(--blue); font-weight:600; }
+  .cmd-text .user { color:var(--orange); }
+  .cmd-text .amt { color:var(--green); font-weight:600; }
+  .cmd-text .rsn { color:var(--purple); }
+  .cmd-placeholder { color:var(--text-muted); font-style:italic; }
+  .copy-btn { position:absolute; top:12px; right:12px; background:var(--bg-hover); border:1px solid var(--border); color:var(--text-secondary); padding:5px 12px; border-radius:6px; font-family:var(--font-ui); font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.15s; }
+  .copy-btn:hover { background:var(--border); color:var(--text-primary); }
+  .copy-btn.copied { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-light); }
+  .section-heading { font-size:13px; font-weight:500; color:var(--text-secondary); display:flex; align-items:center; gap:6px; margin-bottom:10px; }
+  .section-heading::before { content:''; display:inline-block; width:3px; height:12px; background:var(--accent); border-radius:2px; }
+  #result-section { display:none; }
+  #result-section.show { display:block; }
+  .divider { height:1px; background:var(--border-light); margin:1rem 0; }
+  .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-card); border:1px solid var(--accent); color:var(--accent-light); padding:10px 20px; border-radius:8px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px; opacity:0; transition:all 0.25s; pointer-events:none; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .footer { margin-top:2.5rem; font-size:11px; color:var(--text-muted); text-align:center; font-family:var(--font-mono); }
+  /* warn */
+  .warn-box { background:#1c1200; border:1px solid var(--yellow); border-radius:8px; padding:12px 14px; margin-bottom:12px; display:none; }
+  .warn-box.show { display:block; }
+  .warn-title { font-size:12px; font-weight:600; color:var(--yellow); letter-spacing:.04em; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
+  .warn-body { font-size:12px; color:#d4b060; line-height:1.6; }
+  .hl-red { color:var(--red); font-weight:600; }
+  .hl-blue { color:var(--blue); font-weight:600; }
+  /* reason dropdown */
+  .reason-item { display:flex; align-items:center; gap:10px; padding:8px 12px; cursor:pointer; transition:background 0.1s; border-bottom:.5px solid var(--border-light); }
+  .reason-item:last-child { border-bottom:none; }
+  .reason-item:hover { background:var(--bg-hover); }
+  /* hint badge */
+  .hint-badge { display:inline-flex; align-items:center; font-family:var(--font-mono); font-size:11px; font-weight:500; background:#0d1e0d; color:var(--accent-light); border:1px solid var(--accent); border-radius:5px; padding:2px 9px; letter-spacing:.02em; white-space:nowrap; }
+  /* m3 reason input */
+  .m3-reason-input { width:100%; background:#0d1117; border:1.5px solid #3b6fd4; border-radius:7px; color:var(--text-primary); font-family:var(--font-mono); font-size:13px; font-weight:500; padding:8px 11px; outline:none; transition:border-color 0.15s,box-shadow 0.15s; box-sizing:border-box; }
+  .m3-reason-input::placeholder { color:var(--text-muted); font-style:italic; font-size:12px; }
+  .m3-reason-input:focus { border-color:#79c0ff; box-shadow:0 0 0 3px rgba(121,192,255,.12); }
+  /* m3 cmd box copy button */
+  .m3-cmd-box { position:relative; }
+  .m3-copy-btn { position:absolute; top:10px; right:10px; background:var(--bg-hover); border:1px solid var(--border); color:var(--text-secondary); padding:4px 10px; border-radius:6px; font-family:var(--font-ui); font-size:11px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all 0.15s; white-space:nowrap; }
+  .m3-copy-btn:hover { background:var(--border); color:var(--text-primary); }
+  .m3-copy-btn.copied { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-light); }
+  /* m3 select */
+  .m3-select { width:100%; background:#1a2744; border:1.5px solid #3b6fd4; border-radius:8px; color:var(--text-primary); font-family:var(--font-ui); font-size:14px; padding:10px 14px; outline:none; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2379c0ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; transition:border-color 0.15s,background 0.15s; }
+  .m3-select:focus { border-color:#79c0ff; background:#1e2f52; }
+  .m3-select:hover { border-color:#5a9af0; }
+  .m3-select option { background:#1c2128; color:var(--text-primary); }
+  /* m3 slots */
+  .m3-slots { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:600px) { .m3-slots { grid-template-columns:1fr; } }
+  .m3-slot { background:var(--bg-input); border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .m3-slot-title { font-size:11px; font-weight:600; color:#7c8ea6; letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+  .m3-slot-title::before { content:''; display:inline-block; width:3px; height:11px; background:var(--purple); border-radius:2px; }
+  /* tag badge */
+  .tag-badge { display:inline-block; font-family:var(--font-mono); font-size:11px; background:var(--accent-bg); color:var(--accent-light); border:1px solid var(--accent); border-radius:4px; padding:2px 8px; margin-top:6px; }
+  /* cp lookup */
+  .cp-lookup-textarea { width:100%; min-height:72px; max-height:420px; resize:none; overflow-y:auto; font-family:var(--font-mono); font-size:11.5px; line-height:1.6; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); outline:none; transition:border-color 0.15s; box-sizing:border-box; }
+  .cp-lookup-textarea::placeholder { color:var(--text-muted); }
+  .cp-lookup-textarea:focus { border-color:var(--orange); }
+  .cp-result-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .cp-result-card { background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:9px 12px; cursor:pointer; transition:border-color 0.15s,background 0.15s; position:relative; }
+  .cp-result-card:hover { border-color:var(--orange); background:#1e1608; }
+  .cp-result-label { font-size:10px; font-weight:600; color:var(--text-muted); letter-spacing:.07em; text-transform:uppercase; margin-bottom:4px; }
+  .cp-result-value { font-family:var(--font-mono); font-size:13px; font-weight:500; color:var(--orange); word-break:break-all; }
+  .cp-copy-hint { font-size:10px; color:var(--text-muted); margin-top:3px; display:flex; align-items:center; gap:4px; }
+  .cp-result-card .cp-copied-flash { display:none; position:absolute; top:6px; right:8px; font-size:10px; font-weight:600; color:var(--accent-light); background:var(--accent-bg); border:1px solid var(--accent); border-radius:4px; padding:2px 7px; }
+  .cp-result-card.flash .cp-copied-flash { display:block; }
+  /* scroll to top */
+  .scroll-top { position:fixed; bottom:1.75rem; right:1.75rem; width:44px; height:44px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s,background 0.15s,transform 0.15s; z-index:200; }
+  .scroll-top.visible { opacity:1; pointer-events:auto; }
+  .scroll-top:hover { background:var(--bg-hover); color:var(--text-primary); transform:translateY(-2px); }
+  .scroll-top:active { transform:scale(.93); }
+  .footer { margin-top:2.5rem; font-size:11px; color:var(--text-muted); text-align:center; font-family:var(--font-mono); }
 </style>
 </head>
 <body>
@@ -686,27 +142,19 @@
 </header>
 
 <main class="container">
-
-  <!-- Mode tabs -->
   <div class="mode-tabs" role="tablist">
     <button class="tab active" role="tab" aria-selected="true" data-mode="1">
-      <span class="tab-icon">💎</span>
-      <span>補派鑽石</span>
-      <span class="tab-chip">支付成功未派</span>
+      <span class="tab-icon">💎</span><span>補派鑽石</span><span class="tab-chip">支付成功未派</span>
     </button>
     <button class="tab" role="tab" aria-selected="false" data-mode="2">
-      <span class="tab-icon">🎭</span>
-      <span>騙點補鑽</span>
-      <span class="tab-chip">REWH 案件</span>
+      <span class="tab-icon">🎭</span><span>騙點補鑽</span><span class="tab-chip">REWH 案件</span>
     </button>
     <button class="tab" role="tab" aria-selected="false" data-mode="3">
-      <span class="tab-icon">📋</span>
-      <span>補鑽指令</span>
-      <span class="tab-chip">常用區</span>
+      <span class="tab-icon">📋</span><span>補鑽指令</span><span class="tab-chip">常用區</span>
     </button>
   </div>
 
-  <!-- Mode 1: Input panel -->
+  <!-- Mode 1 -->
   <div class="panel" id="panel-mode1">
     <div class="panel-header">
       <div class="panel-dot"></div>
@@ -714,22 +162,38 @@
       <span class="hint-badge">cs:refill_purchase_</span>
     </div>
     <div class="panel-body">
-      <textarea
-        id="raw-input"
-        spellcheck="false"
-        placeholder="將後台訂單資訊完整貼上…"
-      ></textarea>
-      <button class="parse-btn" onclick="parseOrder()">
-        ✦ 生成掉單上分指令
-      </button>
-      <div class="error-bar" id="error-bar">
-        <span>⚠</span>
-        <span id="error-msg"></span>
+      <textarea id="raw-input" spellcheck="false" placeholder="將後台訂單資訊完整貼上…"></textarea>
+      <button class="parse-btn" onclick="parseOrder()">✦ 生成掉單上分指令</button>
+      <div class="error-bar" id="error-bar"><span>⚠</span><span id="error-msg"></span></div>
+    </div>
+  </div>
+
+  <!-- Mode 1: Result -->
+  <div class="panel" id="result-section">
+    <div class="panel-header"><div class="panel-dot"></div><span class="panel-title">擷取結果</span></div>
+    <div class="panel-body">
+      <div class="warn-box" id="warn-no-paid">
+        <div class="warn-title">⚠ 沒 Paid Time</div>
+        <div class="warn-body">Paid: n/a，3rd Party 沒打交易成功 API）：打儲值指令 / 要填儲值表</div>
+      </div>
+      <div class="section-heading">擷取欄位（可手動修改）</div>
+      <div class="fields-grid">
+        <div class="field-card"><div class="field-label">Username</div><input class="field-input" id="f-username" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card"><div class="field-label">Amount（鑽石數）</div><input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card field-wide"><div class="field-label">Order ID</div><input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card" id="field-gateway-wrap"><div class="field-label">Payment Gateway</div><input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card" id="field-reason-wrap"><div class="field-label">Reason 前綴（固定）</div><div class="field-static" id="f-reason-label">cs:refill_purchase_</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-heading">生成指令</div>
+      <div class="cmd-box">
+        <div class="cmd-label">jbot command</div>
+        <div class="cmd-text" id="cmd-display"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Mode 2: Manual input panel -->
+  <!-- Mode 2 -->
   <div class="panel" id="panel-mode2" style="display:none">
     <div class="panel-header">
       <div class="panel-dot" style="background:var(--orange)"></div>
@@ -738,161 +202,59 @@
     </div>
     <div class="panel-body">
       <div class="fields-grid">
-        <div class="field-card field-wide">
-          <div class="field-label">User Name（用戶）</div>
-          <input class="field-input" id="m2-username" type="text" autocomplete="off" oninput="buildCmd2()">
-        </div>
-        <div class="field-card field-wide">
-          <div class="field-label">CP Name（主播）</div>
-          <input class="field-input" id="m2-cpname" type="text" autocomplete="off" oninput="buildCmd2()">
-        </div>
+        <div class="field-card field-wide"><div class="field-label">User Name（用戶）</div><input class="field-input" id="m2-username" type="text" autocomplete="off" oninput="buildCmd2()"></div>
+        <div class="field-card field-wide"><div class="field-label">CP Name（主播）</div><input class="field-input" id="m2-cpname" type="text" autocomplete="off" oninput="buildCmd2()"></div>
         <div class="field-card field-wide">
           <div class="field-label">Amount（鑽石數，支援多筆加總）</div>
-          <input class="field-input" id="m2-amount-raw" type="text" autocomplete="off"
-            oninput="updateAmountPreview()">
+          <input class="field-input" id="m2-amount-raw" type="text" autocomplete="off" oninput="updateAmountPreview()">
           <div id="m2-amount-preview" style="font-size:11px;color:var(--accent-light);margin-top:5px;font-family:var(--font-mono);min-height:16px"></div>
         </div>
         <div class="field-card field-wide" style="position:relative">
           <div class="field-label">Reason（原因說明，選填）</div>
-          <input class="field-input" id="m2-reason" type="text" autocomplete="off"
-            oninput="buildCmd2()"
-            onfocus="showReasonDropdown()"
-            onblur="hideReasonDropdown()">
-          <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.4)">
-            <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
+          <input class="field-input" id="m2-reason" type="text" autocomplete="off" oninput="buildCmd2()" onfocus="showReasonDropdown()" onblur="hideReasonDropdown()">
+          <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4)">
+            <div style="padding:6px 10px;font-size:10px;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border-light)">最近使用</div>
             <div id="reason-list"></div>
             <div id="reason-empty" style="padding:10px 12px;font-size:12px;color:var(--text-muted);display:none">尚無紀錄</div>
           </div>
         </div>
       </div>
-      <button class="parse-btn" style="background:var(--orange);margin-top:4px" onclick="generateScamCmd()" onmouseover="this.style.background='#e8903a'" onmouseout="this.style.background='var(--orange)'">
-        ✦ 生成騙點補鑽指令
-      </button>
-      <div class="error-bar" id="error-bar2">
-        <span>⚠</span>
-        <span id="error-msg2"></span>
-      </div>
+      <button class="parse-btn" style="background:var(--orange);margin-top:4px" onclick="generateScamCmd()" onmouseover="this.style.background='#e8903a'" onmouseout="this.style.background='var(--orange)'">✦ 生成騙點補鑽指令</button>
+      <div class="error-bar" id="error-bar2"><span>⚠</span><span id="error-msg2"></span></div>
     </div>
   </div>
 
-  <!-- Mode 2: Generated command result -->
+  <!-- Mode 2: Result -->
   <div class="panel" id="result-section2" style="display:none">
-    <div class="panel-header">
-      <div class="panel-dot" style="background:var(--orange)"></div>
-      <span class="panel-title">生成指令</span>
-    </div>
+    <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">生成指令</span></div>
     <div class="panel-body">
       <div class="cmd-box">
         <div class="cmd-label">jbot command</div>
-        <div class="cmd-text" id="cmd-display2">
-          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
-        </div>
+        <div class="cmd-text" id="cmd-display2"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Mode 2: CP Lookup panel -->
+  <!-- Mode 2: CP Lookup -->
   <div class="panel" id="panel-cp-lookup" style="display:none">
-    <div class="panel-header">
-      <div class="panel-dot" style="background:var(--orange)"></div>
-      <span class="panel-title">騙點申報快速篩</span>
-    </div>
+    <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">騙點申報快速篩</span></div>
     <div class="panel-body">
-      <!-- Result grid always visible on top -->
       <div class="cp-result-grid" id="cp-result-grid" style="margin-bottom:12px">
-        <div class="cp-result-card" id="cp-card-name" onclick="copyCpField('cp-val-name')">
-          <div class="cp-result-label">CP Name</div>
-          <div class="cp-result-value" id="cp-val-name">—</div>
-          <div class="cp-copy-hint">點擊複製</div>
-          <span class="cp-copied-flash">✓ 已複製</span>
-        </div>
-        <div class="cp-result-card" id="cp-card-company" onclick="copyCpField('cp-val-company')">
-          <div class="cp-result-label">Company</div>
-          <div class="cp-result-value" id="cp-val-company">—</div>
-          <div class="cp-copy-hint">點擊複製</div>
-          <span class="cp-copied-flash">✓ 已複製</span>
-        </div>
-        <div class="cp-result-card" id="cp-card-proj" onclick="copyCpField('cp-val-proj')">
-          <div class="cp-result-label">Project</div>
-          <div class="cp-result-value" id="cp-val-proj">—</div>
-          <div class="cp-copy-hint">點擊複製</div>
-          <span class="cp-copied-flash">✓ 已複製</span>
-        </div>
-        <div class="cp-result-card" id="cp-card-country" onclick="copyCpField('cp-val-country')">
-          <div class="cp-result-label">Country</div>
-          <div class="cp-result-value" id="cp-val-country">—</div>
-          <div class="cp-copy-hint">點擊複製</div>
-          <span class="cp-copied-flash">✓ 已複製</span>
-        </div>
+        <div class="cp-result-card" id="cp-card-name" onclick="copyCpField('cp-val-name')"><div class="cp-result-label">CP Name</div><div class="cp-result-value" id="cp-val-name">—</div><div class="cp-copy-hint">點擊複製</div><span class="cp-copied-flash">✓ 已複製</span></div>
+        <div class="cp-result-card" id="cp-card-company" onclick="copyCpField('cp-val-company')"><div class="cp-result-label">Company</div><div class="cp-result-value" id="cp-val-company">—</div><div class="cp-copy-hint">點擊複製</div><span class="cp-copied-flash">✓ 已複製</span></div>
+        <div class="cp-result-card" id="cp-card-proj" onclick="copyCpField('cp-val-proj')"><div class="cp-result-label">Project</div><div class="cp-result-value" id="cp-val-proj">—</div><div class="cp-copy-hint">點擊複製</div><span class="cp-copied-flash">✓ 已複製</span></div>
+        <div class="cp-result-card" id="cp-card-country" onclick="copyCpField('cp-val-country')"><div class="cp-result-label">Country</div><div class="cp-result-value" id="cp-val-country">—</div><div class="cp-copy-hint">點擊複製</div><span class="cp-copied-flash">✓ 已複製</span></div>
       </div>
-      <!-- Textarea below result cards -->
       <div class="field-label" style="margin-bottom:6px">貼上主播資料</div>
-      <textarea
-        class="cp-lookup-textarea"
-        id="cp-raw-input"
-        spellcheck="false"
+      <textarea class="cp-lookup-textarea" id="cp-raw-input" spellcheck="false"
         placeholder="swag User ID: 57a42a779f22bb6bcc434520&#10;NoneCreated At:&#10;2016-08-05...&#10;Tags:&#10;owner:official signed location:tw company:swag country:tw"
-        oninput="parseCpInfo(); autoResizeCpTextarea(this)"
-        rows="3"
-      ></textarea>
+        oninput="parseCpInfo(); autoResizeCpTextarea(this)" rows="3"></textarea>
     </div>
   </div>
 
-  <!-- Result panel -->
-  <div class="panel" id="result-section">
-    <div class="panel-header">
-      <div class="panel-dot"></div>
-      <span class="panel-title">擷取結果</span>
-    </div>
-    <div class="panel-body">
-      <!-- Warning: Paid:None case -->
-      <div class="warn-box" id="warn-no-paid">
-        <div class="warn-title">⚠ 沒 Paid Time</div>
-        <div class="warn-body">Paid: n/a，3rd Party 沒打交易成功 API）：打儲值指令 / 要填儲值表</div>
-      </div>
-
-      <div class="section-heading">擷取欄位（可手動修改）</div>
-      <div class="fields-grid">
-        <div class="field-card">
-          <div class="field-label">Username</div>
-          <input class="field-input" id="f-username" type="text" autocomplete="off" oninput="buildCmd()">
-        </div>
-        <div class="field-card">
-          <div class="field-label">Amount（鑽石數）</div>
-          <input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="buildCmd()">
-        </div>
-        <div class="field-card field-wide">
-          <div class="field-label">Order ID</div>
-          <input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()">
-        </div>
-        <div class="field-card" id="field-gateway-wrap">
-          <div class="field-label">Payment Gateway</div>
-          <input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="buildCmd()">
-        </div>
-        <div class="field-card" id="field-reason-wrap">
-          <div class="field-label">Reason 前綴（固定）</div>
-          <div class="field-static" id="f-reason-label">cs:refill_purchase_</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="section-heading">生成指令</div>
-      <div class="cmd-box">
-        <div class="cmd-label">jbot command</div>
-        <div class="cmd-text" id="cmd-display">
-          <span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mode 3: 補鑽指令 -->
+  <!-- Mode 3 -->
   <div class="panel" id="panel-mode3" style="display:none">
-    <div class="panel-header">
-      <div class="panel-dot" style="background:var(--purple)"></div>
-      <span class="panel-title">補鑽指令 — 常用區</span>
-    </div>
+    <div class="panel-header"><div class="panel-dot" style="background:var(--purple)"></div><span class="panel-title">補鑽指令 — 常用區</span></div>
     <div class="panel-body">
       <div class="m3-slots">
         <div class="m3-slot">
@@ -930,10 +292,10 @@
           <div id="m3-cmd-wrap-1" style="display:none">
             <div class="cmd-box m3-cmd-box" style="margin-top:0">
               <div class="cmd-label">jbot command</div>
-              <div class="cmd-text" id="cmd-display3-1" style="padding-right:88px">
+              <div class="cmd-text" id="cmd-display3-1" style="padding-right:76px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
-              <span class="m3-copied-badge" id="m3-copied-badge-1">✓ 已複製</span>
+              <button class="m3-copy-btn" id="m3-copy-btn-1" onclick="manualCopyCmd3(1)" title="複製指令">📋 複製</button>
             </div>
           </div>
         </div>
@@ -972,10 +334,10 @@
           <div id="m3-cmd-wrap-2" style="display:none">
             <div class="cmd-box m3-cmd-box" style="margin-top:0">
               <div class="cmd-label">jbot command</div>
-              <div class="cmd-text" id="cmd-display3-2" style="padding-right:88px">
+              <div class="cmd-text" id="cmd-display3-2" style="padding-right:76px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
-              <span class="m3-copied-badge" id="m3-copied-badge-2">✓ 已複製</span>
+              <button class="m3-copy-btn" id="m3-copy-btn-2" onclick="manualCopyCmd3(2)" title="複製指令">📋 複製</button>
             </div>
           </div>
         </div>
@@ -983,17 +345,14 @@
     </div>
   </div>
 
-
-
 </main>
 
-<div class="toast" id="toast">✓ 已複製到剪貼簿</div>
-
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
-
+<div class="toast" id="toast">✓ 已複製到剪貼簿</div>
 <footer class="footer">Swag Live · 客服內部工具 · 僅供內部使用</footer>
 
 <script>
+
 // ── Tab switching ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.tab[data-mode]').forEach(function (btn) {
@@ -1562,12 +921,14 @@ function buildCmd3AndCopy(n) {
   if (lastCmd3[n]) {
     doCopy(lastCmd3[n], function () {
       showToast('✓ 指令已自動複製到剪貼簿');
-      var badge = document.getElementById('m3-copied-badge-' + n);
-      if (badge) {
-        badge.classList.add('show');
+      var btn2 = document.getElementById('m3-copy-btn-' + n);
+      if (btn2) {
+        btn2.classList.add('copied');
+        btn2.textContent = '✓ 已複製';
         clearTimeout(m3BadgeTimers[n]);
         m3BadgeTimers[n] = setTimeout(function () {
-          badge.classList.remove('show');
+          btn2.classList.remove('copied');
+          btn2.textContent = '📋 複製';
         }, 2500);
       }
     });
@@ -1646,6 +1007,23 @@ function copyCpField(elId) {
   });
 }
 
+
+function manualCopyCmd3(n) {
+  var cmd = lastCmd3[n];
+  if (!cmd) return;
+  var btn = document.getElementById('m3-copy-btn-' + n);
+  doCopy(cmd, function () {
+    showToast('\u2713 \u5df2\u8907\u88fd\u6307\u4ee4');
+    if (btn) {
+      btn.classList.add('copied');
+      btn.textContent = '\u2713 \u5df2\u8907\u88fd';
+      setTimeout(function () {
+        btn.classList.remove('copied');
+        btn.innerHTML = '\ud83d\udccb \u8907\u88fd';
+      }, 2200);
+    }
+  });
+}
 
 function autoResizeCpTextarea(el) {
   el.style.height = 'auto';
