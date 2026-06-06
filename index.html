@@ -466,7 +466,7 @@ function parseOrder() {
     document.getElementById('f-reason-label').textContent = '@jbot-test dp';
     document.getElementById('result-section').classList.add('show');
     window._isPaidNone = true;
-    buildCmdNoPaid(username, amount, orderId, '');
+    buildCmdNoPaid(username, amount, orderId, '', raw);
     document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
@@ -569,6 +569,29 @@ function buildCmd() {
 }
 
 // Diamond → USD lookup table
+// SKU pattern → [diamond, usd]
+// Match by product name prefix to avoid ambiguity between packages with same diamond count
+var SKU_MAP = [
+  { pat: /^13499-diamonds-vip_1/i,                     usd: 31    },
+  { pat: /^28999-diamonds-vip_2/i,                     usd: 66    },
+  { pat: /^61999-diamonds-vip_3/i,                     usd: 138   },
+  { pat: /^119999-diamonds-vip_4/i,                    usd: 259   },
+  { pat: /^329999-diamonds-vip_5/i,                    usd: 655   },
+  { pat: /^809999-diamonds-vip_6/i,                    usd: 1552  },
+  { pat: /^1859999-diamonds-vip_7/i,                   usd: 3448  },
+  { pat: /^2899999-diamonds-vip_8/i,                   usd: 5172  },
+  { pat: /^3999-diamonds-limited-daily/i,              usd: 10    },
+  { pat: /^18599-diamonds-from-limited-week/i,         usd: 44    },
+  { pat: /^34599-diamonds-from-limited-month/i,        usd: 79    },
+  { pat: /^7999-diamonds-/i,                           usd: 21    },
+  { pat: /^24999-diamonds-/i,                          usd: 60    },
+  { pat: /^54999-diamonds-/i,                          usd: 132   },
+  { pat: /^159999-diamonds-/i,                         usd: 369   },
+  { pat: /^429999-diamonds-/i,                         usd: 924   },
+  { pat: /^1059999-diamonds-/i,                        usd: 2214  }
+];
+
+// Fallback: plain diamond-count lookup (for any unlisted SKU with known count)
 var DIAMOND_USD = {
   13499: 31, 28999: 66, 61999: 138, 119999: 259, 329999: 655,
   809999: 1552, 1859999: 3448, 2899999: 5172,
@@ -576,14 +599,36 @@ var DIAMOND_USD = {
   7999: 21, 24999: 60, 54999: 132, 159999: 369, 429999: 924, 1059999: 2214
 };
 
+function extractSku(text) {
+  // Extract full SKU token e.g. "8880-diamonds-nu_extra_cny_hkd-hkd-xxxxx"
+  var m = text.match(/(\d+-diamonds-[^\s`]+)/i);
+  return m ? m[1] : null;
+}
+
+function lookupUSDFromSku(sku) {
+  if (!sku) return null;
+  for (var i = 0; i < SKU_MAP.length; i++) {
+    if (SKU_MAP[i].pat.test(sku)) return String(SKU_MAP[i].usd);
+  }
+  return null;
+}
+
 function lookupUSD(amount) {
   var n = parseInt(amount, 10);
   return DIAMOND_USD.hasOwnProperty(n) ? String(DIAMOND_USD[n]) : null;
 }
 
-function buildCmdNoPaid(u, a, o, gw) {
+// Primary lookup: try SKU pattern first, then fall back to diamond count
+function lookupUSDFromText(rawText, amount) {
+  var sku = extractSku(rawText);
+  var bysku = lookupUSDFromSku(sku);
+  if (bysku) return bysku;
+  return lookupUSD(amount);
+}
+
+function buildCmdNoPaid(u, a, o, gw, rawText) {
   var display  = document.getElementById('cmd-display');
-  var usd      = lookupUSD(a);
+  var usd      = lookupUSDFromText(rawText || '', a);
   // 情境 3: Paid:None + USD 查到 → 不顯示；情境 4: Paid:None + 查無 → 顯示
   var hint = document.getElementById('usd-hint');
   if (hint) { usd ? hint.classList.remove('show') : hint.classList.add('show'); }
@@ -620,7 +665,8 @@ function onGatewayInput() {
     var a = document.getElementById('f-amount').value.trim();
     var o = document.getElementById('f-orderid').value.trim();
     var g = document.getElementById('f-gateway').value.trim();
-    buildCmdNoPaid(u, a, o, g);
+    var rawText = document.getElementById('raw-input').value;
+    buildCmdNoPaid(u, a, o, g, rawText);
     if (lastCmd) {
       doCopy(lastCmd, function () {
         showToast('✓ 指令已更新並複製');
