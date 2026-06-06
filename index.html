@@ -63,9 +63,6 @@
   .cmd-text .amt { color:var(--green); font-weight:600; }
   .cmd-text .rsn { color:var(--purple); }
   .cmd-placeholder { color:var(--text-muted); font-style:italic; }
-  .copy-btn { position:absolute; top:12px; right:12px; background:var(--bg-hover); border:1px solid var(--border); color:var(--text-secondary); padding:5px 12px; border-radius:6px; font-family:var(--font-ui); font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.15s; }
-  .copy-btn:hover { background:var(--border); color:var(--text-primary); }
-  .copy-btn.copied { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-light); }
   .section-heading { font-size:13px; font-weight:500; color:var(--text-secondary); display:flex; align-items:center; gap:6px; margin-bottom:10px; }
   .section-heading::before { content:''; display:inline-block; width:3px; height:12px; background:var(--accent); border-radius:2px; }
   #result-section { display:none; }
@@ -73,43 +70,35 @@
   .divider { height:1px; background:var(--border-light); margin:1rem 0; }
   .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-card); border:1px solid var(--accent); color:var(--accent-light); padding:10px 20px; border-radius:8px; font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px; opacity:0; transition:all 0.25s; pointer-events:none; white-space:nowrap; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-  .footer { margin-top:2.5rem; font-size:11px; color:var(--text-muted); text-align:center; font-family:var(--font-mono); }
-  /* warn */
   .warn-box { background:#1c1200; border:1px solid var(--yellow); border-radius:8px; padding:12px 14px; margin-bottom:12px; display:none; }
   .warn-box.show { display:block; }
   .warn-title { font-size:12px; font-weight:600; color:var(--yellow); letter-spacing:.04em; margin-bottom:6px; display:flex; align-items:center; gap:6px; }
   .warn-body { font-size:12px; color:#d4b060; line-height:1.6; }
   .hl-red { color:var(--red); font-weight:600; }
   .hl-blue { color:var(--blue); font-weight:600; }
-  /* reason dropdown */
+  .usd-hint { display:none; font-size:11px; color:var(--yellow); margin-top:5px; }
+  .usd-hint.show { display:block; }
   .reason-item { display:flex; align-items:center; gap:10px; padding:8px 12px; cursor:pointer; transition:background 0.1s; border-bottom:.5px solid var(--border-light); }
   .reason-item:last-child { border-bottom:none; }
   .reason-item:hover { background:var(--bg-hover); }
-  /* hint badge */
   .hint-badge { display:inline-flex; align-items:center; font-family:var(--font-mono); font-size:11px; font-weight:500; background:#0d1e0d; color:var(--accent-light); border:1px solid var(--accent); border-radius:5px; padding:2px 9px; letter-spacing:.02em; white-space:nowrap; }
-  /* m3 reason input */
   .m3-reason-input { width:100%; background:#0d1117; border:1.5px solid #3b6fd4; border-radius:7px; color:var(--text-primary); font-family:var(--font-mono); font-size:13px; font-weight:500; padding:8px 11px; outline:none; transition:border-color 0.15s,box-shadow 0.15s; box-sizing:border-box; }
   .m3-reason-input::placeholder { color:var(--text-muted); font-style:italic; font-size:12px; }
   .m3-reason-input:focus { border-color:#79c0ff; box-shadow:0 0 0 3px rgba(121,192,255,.12); }
-  /* m3 cmd box copy button */
   .m3-cmd-box { position:relative; }
   .m3-copy-btn { position:absolute; top:10px; right:10px; background:var(--bg-hover); border:1px solid var(--border); color:var(--text-secondary); padding:4px 10px; border-radius:6px; font-family:var(--font-ui); font-size:11px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:4px; transition:all 0.15s; white-space:nowrap; }
   .m3-copy-btn:hover { background:var(--border); color:var(--text-primary); }
   .m3-copy-btn.copied { background:var(--accent-bg); border-color:var(--accent); color:var(--accent-light); }
-  /* m3 select */
   .m3-select { width:100%; background:#1a2744; border:1.5px solid #3b6fd4; border-radius:8px; color:var(--text-primary); font-family:var(--font-ui); font-size:14px; padding:10px 14px; outline:none; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2379c0ff' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:36px; transition:border-color 0.15s,background 0.15s; }
   .m3-select:focus { border-color:#79c0ff; background:#1e2f52; }
   .m3-select:hover { border-color:#5a9af0; }
   .m3-select option { background:#1c2128; color:var(--text-primary); }
-  /* m3 slots */
   .m3-slots { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   @media (max-width:600px) { .m3-slots { grid-template-columns:1fr; } }
   .m3-slot { background:var(--bg-input); border:1px solid var(--border); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:10px; }
   .m3-slot-title { font-size:11px; font-weight:600; color:#7c8ea6; letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
   .m3-slot-title::before { content:''; display:inline-block; width:3px; height:11px; background:var(--purple); border-radius:2px; }
-  /* tag badge */
   .tag-badge { display:inline-block; font-family:var(--font-mono); font-size:11px; background:var(--accent-bg); color:var(--accent-light); border:1px solid var(--accent); border-radius:4px; padding:2px 8px; margin-top:6px; }
-  /* cp lookup */
   .cp-lookup-textarea { width:100%; min-height:72px; max-height:420px; resize:none; overflow-y:auto; font-family:var(--font-mono); font-size:11.5px; line-height:1.6; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); outline:none; transition:border-color 0.15s; box-sizing:border-box; }
   .cp-lookup-textarea::placeholder { color:var(--text-muted); }
   .cp-lookup-textarea:focus { border-color:var(--orange); }
@@ -121,7 +110,6 @@
   .cp-copy-hint { font-size:10px; color:var(--text-muted); margin-top:3px; display:flex; align-items:center; gap:4px; }
   .cp-result-card .cp-copied-flash { display:none; position:absolute; top:6px; right:8px; font-size:10px; font-weight:600; color:var(--accent-light); background:var(--accent-bg); border:1px solid var(--accent); border-radius:4px; padding:2px 7px; }
   .cp-result-card.flash .cp-copied-flash { display:block; }
-  /* scroll to top */
   .scroll-top { position:fixed; bottom:1.75rem; right:1.75rem; width:44px; height:44px; border-radius:50%; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s,background 0.15s,transform 0.15s; z-index:200; }
   .scroll-top.visible { opacity:1; pointer-events:auto; }
   .scroll-top:hover { background:var(--bg-hover); color:var(--text-primary); transform:translateY(-2px); }
@@ -130,77 +118,53 @@
 </style>
 </head>
 <body>
-
 <header class="app-header">
   <div class="app-logo">
     <div class="logo-icon">💎</div>
-    <div>
-      <div class="app-name">Deposit 指令生成器</div>
-      <div class="app-sub">@jbot-test · 客服內部快速指令工具</div>
-    </div>
+    <div><div class="app-name">Deposit 指令生成器</div><div class="app-sub">@jbot-test · 客服內部快速指令工具</div></div>
   </div>
   <div class="version-badge">v1.0</div>
 </header>
-
 <main class="container">
   <div class="mode-tabs" role="tablist">
-    <button class="tab active" role="tab" aria-selected="true" data-mode="1">
-      <span class="tab-icon">💎</span><span>補派鑽石</span><span class="tab-chip">支付成功未派</span>
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-mode="2">
-      <span class="tab-icon">🎭</span><span>騙點補鑽</span><span class="tab-chip">REWH 案件</span>
-    </button>
-    <button class="tab" role="tab" aria-selected="false" data-mode="3">
-      <span class="tab-icon">📋</span><span>補鑽指令</span><span class="tab-chip">常用區</span>
-    </button>
+    <button class="tab active" role="tab" aria-selected="true" data-mode="1"><span class="tab-icon">💎</span><span>補派鑽石</span><span class="tab-chip">支付成功未派</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="2"><span class="tab-icon">🎭</span><span>騙點補鑽</span><span class="tab-chip">REWH 案件</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="3"><span class="tab-icon">📋</span><span>補鑽指令</span><span class="tab-chip">常用區</span></button>
   </div>
-
   <!-- Mode 1 -->
   <div class="panel" id="panel-mode1">
-    <div class="panel-header">
-      <div class="panel-dot"></div>
-      <span class="panel-title">貼上訂單資訊</span>
-      <span class="hint-badge">cs:refill_purchase_</span>
-    </div>
+    <div class="panel-header"><div class="panel-dot"></div><span class="panel-title">貼上訂單資訊</span><span class="hint-badge">cs:refill_purchase_</span></div>
     <div class="panel-body">
-      <textarea id="raw-input" spellcheck="false" placeholder="將後台訂單資訊完整貼上…"></textarea>
+      <textarea id="raw-input" spellcheck="false" placeholder="將後台訂單資訊完整貼上…" onpaste="cleanOrderPaste(event)"></textarea>
       <button class="parse-btn" onclick="parseOrder()">✦ 生成掉單上分指令</button>
       <div class="error-bar" id="error-bar"><span>⚠</span><span id="error-msg"></span></div>
     </div>
   </div>
-
-  <!-- Mode 1: Result -->
+  <!-- Mode 1 Result -->
   <div class="panel" id="result-section">
     <div class="panel-header"><div class="panel-dot"></div><span class="panel-title">擷取結果</span></div>
     <div class="panel-body">
-      <div class="warn-box" id="warn-no-paid">
-        <div class="warn-title">⚠ 沒 Paid Time</div>
-        <div class="warn-body">Paid: n/a，3rd Party 沒打交易成功 API）：打儲值指令 / 要填儲值表</div>
-      </div>
+      <div class="warn-box" id="warn-no-paid"><div class="warn-title">⚠ 沒 Paid Time</div><div class="warn-body">Paid: n/a，3rd Party 沒打交易成功 API）：打儲值指令 / 要填儲值表</div></div>
       <div class="section-heading">擷取欄位（可手動修改）</div>
       <div class="fields-grid">
         <div class="field-card"><div class="field-label">Username</div><input class="field-input" id="f-username" type="text" autocomplete="off" oninput="buildCmd()"></div>
         <div class="field-card"><div class="field-label">Amount（鑽石數）</div><input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="buildCmd()"></div>
         <div class="field-card field-wide"><div class="field-label">Order ID</div><input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()"></div>
-        <div class="field-card" id="field-gateway-wrap"><div class="field-label">Payment Gateway</div><input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card" id="field-gateway-wrap">
+          <div class="field-label" id="f-gateway-label">Payment Gateway</div>
+          <input class="field-input" id="f-gateway" type="text" autocomplete="off" oninput="onGatewayInput()">
+          <div class="usd-hint" id="usd-hint">⚠ 注意禮包類型，自行輸入 USD</div>
+        </div>
         <div class="field-card" id="field-reason-wrap"><div class="field-label">Reason 前綴（固定）</div><div class="field-static" id="f-reason-label">cs:refill_purchase_</div></div>
       </div>
       <div class="divider"></div>
       <div class="section-heading">生成指令</div>
-      <div class="cmd-box">
-        <div class="cmd-label">jbot command</div>
-        <div class="cmd-text" id="cmd-display"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div>
-      </div>
+      <div class="cmd-box"><div class="cmd-label">jbot command</div><div class="cmd-text" id="cmd-display"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div>
     </div>
   </div>
-
   <!-- Mode 2 -->
   <div class="panel" id="panel-mode2" style="display:none">
-    <div class="panel-header">
-      <div class="panel-dot" style="background:var(--orange)"></div>
-      <span class="panel-title">騙點補鑽 — 手動輸入</span>
-      <span class="hint-badge" style="background:#1e0d00;color:var(--orange);border-color:var(--orange)">cs:refund_creator_scam_</span>
-    </div>
+    <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">騙點補鑽 — 手動輸入</span><span class="hint-badge" style="background:#1e0d00;color:var(--orange);border-color:var(--orange)">cs:refund_creator_scam_</span></div>
     <div class="panel-body">
       <div class="fields-grid">
         <div class="field-card field-wide"><div class="field-label">User Name（用戶）</div><input class="field-input" id="m2-username" type="text" autocomplete="off" oninput="buildCmd2()"></div>
@@ -224,19 +188,12 @@
       <div class="error-bar" id="error-bar2"><span>⚠</span><span id="error-msg2"></span></div>
     </div>
   </div>
-
-  <!-- Mode 2: Result -->
+  <!-- Mode 2 Result -->
   <div class="panel" id="result-section2" style="display:none">
     <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">生成指令</span></div>
-    <div class="panel-body">
-      <div class="cmd-box">
-        <div class="cmd-label">jbot command</div>
-        <div class="cmd-text" id="cmd-display2"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div>
-      </div>
-    </div>
+    <div class="panel-body"><div class="cmd-box"><div class="cmd-label">jbot command</div><div class="cmd-text" id="cmd-display2"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div></div>
   </div>
-
-  <!-- Mode 2: CP Lookup -->
+  <!-- Mode 2 CP Lookup -->
   <div class="panel" id="panel-cp-lookup" style="display:none">
     <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">騙點申報快速篩</span></div>
     <div class="panel-body">
@@ -252,7 +209,6 @@
         oninput="parseCpInfo(); autoResizeCpTextarea(this)" rows="3"></textarea>
     </div>
   </div>
-
   <!-- Mode 3 -->
   <div class="panel" id="panel-mode3" style="display:none">
     <div class="panel-header"><div class="panel-dot" style="background:var(--purple)"></div><span class="panel-title">補鑽指令 — 常用區</span></div>
@@ -345,14 +301,12 @@
       </div>
     </div>
   </div>
-
 </main>
-
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
 <div class="toast" id="toast">✓ 已複製到剪貼簿</div>
 <footer class="footer">Swag Live · 客服內部工具 · 僅供內部使用</footer>
-
 <script>
+
 
 // ── Tab switching ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
@@ -451,6 +405,31 @@ function extractPaid(text) {
   return v;
 }
 
+function cleanOrderPaste(e) {
+  e.preventDefault();
+  var text = (e.clipboardData || window.clipboardData).getData('text');
+  // Strip markdown links [text](url) -> text
+  text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  // Strip backticks
+  text = text.replace(/`/g, '');
+  // Re-insert newlines before known field keywords (handles single-line paste)
+  var BREAKS = [
+    'Order Details for',
+    'User ID:', 'Username:', 'Created:', 'Canceled:', 'Paid:',
+    'Fulfilled:', 'Payment Gateway:', 'Payment ID:', 'Total:'
+  ];
+  BREAKS.forEach(function(k) {
+    // Only add newline if not already preceded by one
+    var re = new RegExp('([^\n])(' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
+    text = text.replace(re, '$1\n$2');
+  });
+  // Collapse multiple blank lines
+  text = text.replace(/\n{3,}/g, '\n\n').trim();
+  // Insert cleaned text into textarea
+  var ta = document.getElementById('raw-input');
+  ta.value = text;
+}
+
 function parseOrder() {
   var raw = normalizeOrder(document.getElementById('raw-input').value.trim());
   hideError();
@@ -477,12 +456,17 @@ function parseOrder() {
     document.getElementById('f-username').value = username;
     document.getElementById('f-amount').value   = amount;
     document.getElementById('f-orderid').value  = orderId;
+    // Gateway: clear and make editable with prompt label
     document.getElementById('f-gateway').value  = '';
-    document.getElementById('field-gateway-wrap').style.opacity = '0.4';
-    document.getElementById('field-reason-wrap').style.opacity  = '0.4';
+    document.getElementById('f-gateway').placeholder = '請輸入 Payment Gateway…';
+    document.getElementById('f-gateway-label').textContent = 'Payment Gateway（請手動輸入）';
+    document.getElementById('field-gateway-wrap').style.opacity = '';
+    document.getElementById('field-gateway-wrap').style.borderColor = 'var(--orange)';
+    document.getElementById('field-reason-wrap').style.opacity = '';
+    document.getElementById('f-reason-label').textContent = '@jbot-test dp';
     document.getElementById('result-section').classList.add('show');
-    buildCmdNoPaid(username, amount, orderId);
-    autoCopyCmdRaw(lastCmd);
+    window._isPaidNone = true;
+    buildCmdNoPaid(username, amount, orderId, '');
     document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
@@ -496,7 +480,14 @@ function parseOrder() {
 
   document.getElementById('warn-no-paid').classList.remove('show');
   document.getElementById('field-gateway-wrap').style.opacity = '';
-  document.getElementById('field-reason-wrap').style.opacity  = '';
+  document.getElementById('field-gateway-wrap').style.borderColor = '';
+  document.getElementById('f-gateway-label').textContent = 'Payment Gateway';
+  document.getElementById('f-gateway').placeholder = '';
+  document.getElementById('field-reason-wrap').style.opacity = '';
+  document.getElementById('f-reason-label').textContent = 'cs:refill_purchase_';
+  var _hint = document.getElementById('usd-hint');
+  if (_hint) _hint.classList.remove('show');
+  window._isPaidNone = false;
   document.getElementById('f-username').value = username;
   document.getElementById('f-amount').value   = amount;
   document.getElementById('f-orderid').value  = orderId;
@@ -565,6 +556,9 @@ function buildCmd() {
     display.innerHTML = '<span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span>';
     lastCmd = ''; return;
   }
+  // 情境 1 & 2: Paid 有值時永遠不顯示提示
+  var hint = document.getElementById('usd-hint');
+  if (hint) hint.classList.remove('show');
   lastCmd = '@jbot-test deposit ' + u + '/' + a + ' cs:refill_purchase_' + g + '_' + o;
   display.innerHTML =
     '<span class="kw">@jbot-test deposit</span> ' +
@@ -574,19 +568,67 @@ function buildCmd() {
     '<span class="rsn">cs:refill_purchase_' + esc(g) + '_' + esc(o) + '</span>';
 }
 
-function buildCmdNoPaid(u, a, o) {
-  var display = document.getElementById('cmd-display');
-  // Format: @jbot-test dp USERNAME/AMOUNT USD paymentgateway-refill-ORDERID
-  lastCmd = '@jbot-test dp ' + u + '/' + a + ' USD paymentgateway-refill-' + o;
+// Diamond → USD lookup table
+var DIAMOND_USD = {
+  13499: 31, 28999: 66, 61999: 138, 119999: 259, 329999: 655,
+  809999: 1552, 1859999: 3448, 2899999: 5172,
+  3999: 10, 15999: 44, 34599: 79,
+  7999: 21, 24999: 60, 54999: 132, 159999: 369, 429999: 924, 1059999: 2214
+};
+
+function lookupUSD(amount) {
+  var n = parseInt(amount, 10);
+  return DIAMOND_USD.hasOwnProperty(n) ? String(DIAMOND_USD[n]) : null;
+}
+
+function buildCmdNoPaid(u, a, o, gw) {
+  var display  = document.getElementById('cmd-display');
+  var usd      = lookupUSD(a);
+  // 情境 3: Paid:None + USD 查到 → 不顯示；情境 4: Paid:None + 查無 → 顯示
+  var hint = document.getElementById('usd-hint');
+  if (hint) { usd ? hint.classList.remove('show') : hint.classList.add('show'); }
+  var usdLabel = usd ? usd : 'USD';
+  var unknownUsd = !usd;
+
+  var gwPart = gw ? gw : 'Gateway';
+  lastCmd = '@jbot-test dp ' + u + '/' + a + ' ' + usdLabel + ' ' + gwPart + '-fulfilled-' + o;
+
+  if (unknownUsd) {
+    hint.classList.add('show');
+  } else {
+    hint.classList.remove('show');
+  }
+
   display.innerHTML =
     '<span class="kw">@jbot-test dp</span> ' +
     '<span class="user">' + esc(u) + '</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + esc(a) + '</span> ' +
-    '<span class="hl-red">USD</span> ' +
-    '<span class="hl-blue">paymentgateway</span>' +
-    '<span style="color:var(--text-secondary)">-refill-</span>' +
+    (unknownUsd
+      ? '<span class="hl-red">USD</span> '
+      : '<span class="hl-red">' + usdLabel + '</span> ') +
+    (gw
+      ? '<span class="hl-blue">' + esc(gw) + '</span>'
+      : '<span class="hl-blue">Gateway</span>') +
+    '<span style="color:var(--text-secondary)">-fulfilled-</span>' +
     '<span class="rsn">' + esc(o) + '</span>';
+}
+
+function onGatewayInput() {
+  if (window._isPaidNone) {
+    var u = document.getElementById('f-username').value.trim();
+    var a = document.getElementById('f-amount').value.trim();
+    var o = document.getElementById('f-orderid').value.trim();
+    var g = document.getElementById('f-gateway').value.trim();
+    buildCmdNoPaid(u, a, o, g);
+    if (lastCmd) {
+      doCopy(lastCmd, function () {
+        showToast('✓ 指令已更新並複製');
+      });
+    }
+  } else {
+    buildCmd();
+  }
 }
 
 function autoCopyCmdRaw(cmd) {
@@ -1030,6 +1072,7 @@ function autoResizeCpTextarea(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 420) + 'px';
 }
+
 
 </script>
 </body>
