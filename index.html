@@ -423,6 +423,10 @@ function cleanOrderPaste(e) {
     var re = new RegExp('([^\n])(' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
     text = text.replace(re, '$1\n$2');
   });
+  // Break before SKU lines: digits immediately followed by "-diamonds-"
+  text = text.replace(/([^\n])(\d+-diamonds-)/g, '$1\n$2');
+  // Break before payment-gateway-fee lines
+  text = text.replace(/([^\n])(payment-gateway-fee-)/gi, '$1\n$2');
   // Collapse multiple blank lines
   text = text.replace(/\n{3,}/g, '\n\n').trim();
   // Insert cleaned text into textarea
