@@ -115,9 +115,105 @@
   .scroll-top:hover { background:var(--bg-hover); color:var(--text-primary); transform:translateY(-2px); }
   .scroll-top:active { transform:scale(.93); }
   .footer { margin-top:2.5rem; font-size:11px; color:var(--text-muted); text-align:center; font-family:var(--font-mono); }
+
+  /* ── Email Gate Modal ── */
+  #email-gate-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(8,10,14,0.92);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+    transition: opacity 0.3s ease;
+  }
+  #email-gate-overlay.fade-out { opacity: 0; pointer-events: none; }
+  .gate-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 1.75rem;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .gate-icon {
+    width: 48px; height: 48px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 1rem;
+  }
+  .gate-title {
+    font-size: 16px; font-weight: 600; color: var(--text-primary);
+    text-align: center; margin-bottom: 6px;
+  }
+  .gate-sub {
+    font-size: 12.5px; color: var(--text-secondary);
+    text-align: center; margin-bottom: 1.5rem; line-height: 1.6;
+  }
+  .gate-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .gate-input::placeholder { color: var(--text-muted); }
+  .gate-input:focus { border-color: var(--accent); }
+  .gate-input.error { border-color: var(--red); }
+  .gate-error-msg {
+    display: none;
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .gate-error-msg.show { display: block; }
+  .gate-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 11px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .gate-btn:hover { background: var(--accent-hover); }
+  .gate-footer-note {
+    font-size: 10.5px; color: var(--text-muted);
+    text-align: center; margin-top: 14px; line-height: 1.5;
+  }
+  #app-root { display: none; }
+  #app-root.unlocked { display: contents; }
 </style>
 </head>
 <body>
+
+<!-- Email Gate Modal -->
+<div id="email-gate-overlay">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">內部工具驗證</div>
+    <div class="gate-sub">請輸入公司信箱以使用此工具</div>
+    <input type="email" class="gate-input" id="gate-email-input" placeholder="name.surname@swag.live" autocomplete="off" onkeydown="if(event.key==='Enter')verifyGateEmail()">
+    <div class="gate-error-msg" id="gate-error-msg">⚠ 請填寫公司信箱查看</div>
+    <button class="gate-btn" onclick="verifyGateEmail()">驗證並進入</button>
+    <div class="gate-footer-note">驗證狀態將保留 24 小時，逾時需重新驗證</div>
+  </div>
+</div>
+
+<div id="app-root">
 <header class="app-header">
   <div class="app-logo">
     <div class="logo-icon">💎</div>
@@ -305,6 +401,7 @@
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
 <div class="toast" id="toast">✓ 已複製到剪貼簿</div>
 <footer class="footer">Swag Live · 客服內部工具 · 僅供內部使用</footer>
+</div>
 <script>
 
 
@@ -360,7 +457,24 @@ function showToast(msg) {
   }, 2500);
 }
 
-function doCopy(text, onDone) {
+// GAS Web App URL — 貼上你部署後拿到的網址（見 gas-logger.gs 說明）
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbz5KfXOydCFUiAUwx7ISAIlg7k7vobmwkXx6Od_id0zX2e0yV9peP9exEZmv0RXdml5bA/exec';
+
+function logUsage(modeLabel, cmdText) {
+  if (!GAS_URL || GAS_URL.indexOf('PASTE_YOUR_GAS_WEB_APP_URL_HERE') !== -1) return;
+  var email = sessionStorage.getItem('verifiedEmail') || localStorage.getItem('verifiedEmail') || '';
+  try {
+    fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ email: email, mode: modeLabel || '', cmd: cmdText || '' })
+    }).catch(function () {});
+  } catch (e) {}
+}
+
+function doCopy(text, onDone, modeLabel) {
+  if (modeLabel) logUsage(modeLabel, text);
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(onDone).catch(function () {
       fallbackCopy(text); onDone();
@@ -740,7 +854,7 @@ function onGatewayInput() {
     if (lastCmd) {
       doCopy(lastCmd, function () {
         showToast('✓ 指令已更新並複製');
-      });
+      }, '補派鑽石-Paid:None');
     }
   } else {
     buildCmd();
@@ -751,14 +865,14 @@ function autoCopyCmdRaw(cmd) {
   if (!cmd) return;
   doCopy(cmd, function () {
     showToast('✓ 指令已自動複製到剪貼簿');
-  });
+  }, '補派鑽石-Paid:None');
 }
 
 function autoCopyCmd() {
   if (!lastCmd) return;
   doCopy(lastCmd, function () {
     showToast('✓ 指令已自動複製到剪貼簿');
-  });
+  }, '補派鑽石');
 }
 
 function copyCmd() {
@@ -774,7 +888,7 @@ function copyCmd() {
       document.getElementById('copy-icon').textContent  = '📋';
       document.getElementById('copy-label').textContent = '複製';
     }, 2500);
-  });
+  }, '補派鑽石');
 }
 
 function showError(msg) {
@@ -876,7 +990,7 @@ function autoCopyCmd2() {
   if (!lastCmd2) return;
   doCopy(lastCmd2, function () {
     showToast('✓ 指令已自動複製到剪貼簿');
-  });
+  }, '騙點補鑽');
 }
 
 function copyCmd2() {
@@ -892,7 +1006,7 @@ function copyCmd2() {
       document.getElementById('copy-icon2').textContent  = '📋';
       document.getElementById('copy-label2').textContent = '複製';
     }, 2500);
-  });
+  }, '騙點補鑽');
 }
 
 // ── Reason history (frequency-sorted, top 8) ────────────────────────────────
@@ -1090,7 +1204,7 @@ function buildCmd3AndCopy(n) {
           btn2.textContent = '📋 複製';
         }, 2500);
       }
-    });
+    }, '補鑽指令-組' + n);
   }
 }
 
@@ -1163,7 +1277,7 @@ function copyCpField(elId) {
         card.classList.remove('flash');
       }, 1800);
     }
-  });
+  }, '騙點申報快速篩');
 }
 
 
@@ -1181,7 +1295,7 @@ function manualCopyCmd3(n) {
         btn.innerHTML = '\ud83d\udccb \u8907\u88fd';
       }, 2200);
     }
-  });
+  }, '補鑽指令-組' + n);
 }
 
 function autoResizeCpTextarea(el) {
@@ -1189,6 +1303,104 @@ function autoResizeCpTextarea(el) {
   el.style.height = Math.min(el.scrollHeight, 420) + 'px';
 }
 
+// ── Email Gate ───────────────────────────────────────────────────────────────
+var GATE_KEY = 'gateAuth_v1';
+var GATE_TTL_MS = 24 * 60 * 60 * 1000; // 24 小時
+
+// 特殊允許帳號（沒有「英文名.姓氏羅馬拼音」格式）
+var SPECIAL_ACCOUNTS = [
+  'sam', 'bogi', 'lynn', 'pot', 'amy', 'bill.h', 'abby', 'maimai', 'suyu.c'
+];
+
+function isValidCompanyEmail(email) {
+  email = (email || '').trim().toLowerCase();
+  var m = email.match(/^([a-z0-9._-]+)@swag\.live$/);
+  if (!m) return false;
+  var account = m[1];
+
+  // 1. 特殊帳號白名單
+  if (SPECIAL_ACCOUNTS.indexOf(account) !== -1) return true;
+
+  // 2. 純數字帳號 → 禁止
+  if (/^\d+$/.test(account)) return false;
+
+  // 3. 必須符合「英文名.姓氏羅馬拼音」格式：至少一個點，點前後都是字母
+  var parts = account.split('.');
+  if (parts.length !== 2) return false;
+  var first = parts[0], last = parts[1];
+  if (!first || !last) return false;
+  if (!/^[a-z]+$/.test(first) || !/^[a-z]+$/.test(last)) return false;
+
+  // 4. 排除單一字母重複過多次的亂打帳號（如 ooooooo, fjseedosij 風格）
+  //    規則：任一部分若全部字母都相同（重複字母）→ 視為無效
+  if (/^([a-z])\1+$/.test(first) || /^([a-z])\1+$/.test(last)) return false;
+
+  // 名字、姓氏羅馬拼音通常落在 2~14 字元之間，超出範圍視為可疑亂打
+  if (first.length < 2 || first.length > 14) return false;
+  if (last.length < 2 || last.length > 14) return false;
+
+  return true;
+}
+
+function showGateError(msg) {
+  var el = document.getElementById('gate-error-msg');
+  var input = document.getElementById('gate-email-input');
+  el.textContent = msg;
+  el.classList.add('show');
+  input.classList.add('error');
+}
+
+function hideGateError() {
+  document.getElementById('gate-error-msg').classList.remove('show');
+  document.getElementById('gate-email-input').classList.remove('error');
+}
+
+function verifyGateEmail() {
+  var input = document.getElementById('gate-email-input');
+  var email = input.value.trim();
+  hideGateError();
+
+  if (!email) {
+    showGateError('⚠ 請填寫公司信箱查看');
+    return;
+  }
+  if (!isValidCompanyEmail(email)) {
+    showGateError('⚠ 請填寫公司信箱查看');
+    return;
+  }
+
+  // 記錄驗證狀態（24 小時）
+  var record = { email: email.toLowerCase(), ts: Date.now() };
+  try { localStorage.setItem(GATE_KEY, JSON.stringify(record)); } catch (e) {}
+  try { localStorage.setItem('verifiedEmail', email.toLowerCase()); } catch (e) {}
+
+  unlockApp();
+}
+
+function unlockApp() {
+  var overlay = document.getElementById('email-gate-overlay');
+  var root = document.getElementById('app-root');
+  root.classList.add('unlocked');
+  overlay.classList.add('fade-out');
+  setTimeout(function () {
+    overlay.style.display = 'none';
+  }, 320);
+}
+
+function checkGateOnLoad() {
+  try {
+    var raw = localStorage.getItem(GATE_KEY);
+    if (!raw) return;
+    var record = JSON.parse(raw);
+    if (record && record.ts && (Date.now() - record.ts) < GATE_TTL_MS) {
+      unlockApp();
+    } else {
+      localStorage.removeItem(GATE_KEY);
+    }
+  } catch (e) {}
+}
+
+checkGateOnLoad();
 
 </script>
 </body>
