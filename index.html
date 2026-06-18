@@ -384,52 +384,56 @@ function fallbackCopy(text) {
 var lastCmd = '';
 
 function normalizeOrder(text) {
-  var keys = [
-    'Order Details for', 'User ID', 'Username', 'Created', 'Canceled',
-    'Paid', 'Fulfilled', 'Payment Gateway', 'Payment ID', 'Total'
-  ];
-  var out = text;
-  keys.forEach(function (k) {
-    var re = new RegExp('(?<!\n)(' + k.replace(' ', '\\s*') + ':)', 'g');
-    out = out.replace(re, '\n$1');
-  });
-  out = out.replace(/(?<!\n)(Order Details for\s+[a-f0-9]{20,})/i, '\n$1');
+  // Only strip markdown links and backticks — preserve original line breaks as-is
+  var out = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  out = out.replace(/`/g, '');
   return out;
 }
 
 // Returns 'none' string if paid is None, otherwise truthy string
 function extractPaid(text) {
+  var v = extractFieldRaw(text, 'Paid:');
+  if (v !== null) return v;
   var m = text.match(/^Paid:\s*(.+)/im);
   if (!m) return null;
-  var v = m[1].split('\n')[0].trim();
-  return v;
+  return m[1].split('\n')[0].trim();
+}
+
+// Purely cosmetic re-formatting for display — adds line breaks before known
+// field labels so the textarea is easy to read. This NEVER affects parsing,
+// since extraction now uses boundary-based matching that works either way.
+function prettyFormatOrder(text) {
+  var LABELS = [
+    'User ID:', 'Username:', 'Created:', 'Canceled:', 'Paid:',
+    'Fulfilled:', 'Payment Gateway:', 'Payment ID:', 'Total:'
+  ];
+  var out = text;
+  LABELS.forEach(function (label) {
+    var re = new RegExp('([^\n])(' + label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
+    out = out.replace(re, '$1\n$2');
+  });
+  // Break before "Order Details for <id>" if glued to preceding text
+  out = out.replace(/([^\n])(Order Details for\s+[a-f0-9]{20,})/i, '$1\n$2');
+  // Break before SKU lines (digits-diamonds-...) when glued to previous content
+  out = out.replace(/([^\n])(\d{3,8}-diamonds-)/gi, function (m, p1, p2, offset, str) {
+    // Avoid breaking digits that are clearly part of a longer numeric ID run
+    return p1 + '\n' + p2;
+  });
+  // Break before payment-gateway-fee lines
+  out = out.replace(/([^\n])(payment-gateway-fee-)/gi, '$1\n$2');
+  // Collapse 3+ blank lines down to 1
+  out = out.replace(/\n{3,}/g, '\n\n');
+  return out.trim();
 }
 
 function cleanOrderPaste(e) {
   e.preventDefault();
   var text = (e.clipboardData || window.clipboardData).getData('text');
-  // Strip markdown links [text](url) -> text
+  // Strip markdown links and backticks
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
-  // Strip backticks
   text = text.replace(/`/g, '');
-  // Re-insert newlines before known field keywords (handles single-line paste)
-  var BREAKS = [
-    'Order Details for',
-    'User ID:', 'Username:', 'Created:', 'Canceled:', 'Paid:',
-    'Fulfilled:', 'Payment Gateway:', 'Payment ID:', 'Total:'
-  ];
-  BREAKS.forEach(function(k) {
-    // Only add newline if not already preceded by one
-    var re = new RegExp('([^\n])(' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'g');
-    text = text.replace(re, '$1\n$2');
-  });
-  // Break before SKU lines: digits immediately followed by "-diamonds-"
-  text = text.replace(/([^\n])(\d+-diamonds-)/g, '$1\n$2');
-  // Break before payment-gateway-fee lines
-  text = text.replace(/([^\n])(payment-gateway-fee-)/gi, '$1\n$2');
-  // Collapse multiple blank lines
-  text = text.replace(/\n{3,}/g, '\n\n').trim();
-  // Insert cleaned text into textarea
+  // Cosmetic re-formatting for readability (parsing is unaffected either way)
+  text = prettyFormatOrder(text);
   var ta = document.getElementById('raw-input');
   ta.value = text;
 }
@@ -439,7 +443,7 @@ function parseOrder() {
   hideError();
   if (!raw) { showError('請先貼上訂單資訊'); return; }
 
-  var username = matchToken(raw, /^Username:\s*(\S+)/m);
+  var username = extractUsername(raw);
   var orderId  = extractOrderId(raw);
   var amount   = extractAmount(raw);
   var paid     = extractPaid(raw);
@@ -503,6 +507,29 @@ function parseOrder() {
   document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Known field labels — used as "stop" boundaries when extracting a value that
+// may be glued (no separating newline/space) directly to the next field label.
+var FIELD_LABELS = [
+  'User ID:', 'Username:', 'Created:', 'Canceled:', 'Paid:',
+  'Fulfilled:', 'Payment Gateway:', 'Payment ID:', 'Total:'
+];
+
+function fieldBoundaryPattern() {
+  return '(?:' + FIELD_LABELS.map(function (k) {
+    return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }).join('|') + '|$)';
+}
+
+// Extract the raw value following a field label, stopping right before the
+// next known field label (handles both newline-separated and glued-together text)
+function extractFieldRaw(text, label) {
+  var safeLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  var re = new RegExp(safeLabel + '\\s*([\\s\\S]*?)(?=' + fieldBoundaryPattern() + ')', 'i');
+  var m = text.match(re);
+  if (!m) return null;
+  return m[1].replace(/\s+$/, '').trim();
+}
+
 function matchLine(text, regex) {
   var m = text.match(regex);
   return m ? m[1].split('\n')[0].trim() : null;
@@ -512,10 +539,22 @@ function matchToken(text, regex) {
   var m = text.match(regex);
   if (!m) return null;
   var v = m[1].split(/\s/)[0].trim();
-  // Strip markdown link syntax [text](url) -> text
   var linkMatch = v.match(/^\[([^\]]+)\]/);
   if (linkMatch) v = linkMatch[1];
   return v === 'None' ? null : v;
+}
+
+// Username: use boundary-based extraction first (handles glued text),
+// fall back to whitespace-token matching for normal newline-separated text
+function extractUsername(text) {
+  var v = extractFieldRaw(text, 'Username:');
+  if (v) {
+    var linkMatch = v.match(/^\[([^\]]+)\]/);
+    if (linkMatch) v = linkMatch[1];
+    v = v.split(/\s/)[0].trim();
+    if (v && v.toLowerCase() !== 'none') return v;
+  }
+  return matchToken(text, /^Username:\s*(\S+)/m);
 }
 
 function extractOrderId(text) {
@@ -528,22 +567,49 @@ function extractOrderId(text) {
   return null;
 }
 
+// Known diamond/SKU amounts — checked first (longest match) to correctly split
+// an amount that may be glued directly to a preceding Order/Payment ID
+var KNOWN_SKU_AMOUNTS = [
+  '2899999', '1859999', '1059999', '809999', '429999', '329999', '159999',
+  '119999', '61999', '54999', '34599', '28999', '24999', '18599', '15999',
+  '13499', '7999', '6880', '8880', '8599', '4999', '3999', '1999', '9990'
+];
+
 function extractAmount(text) {
-  var m = text.match(/(\d+)-diamonds/i);
-  if (m) return m[1];
-  var m2 = text.match(/Amount[:\s]+(\d+)/i);
-  if (m2) return m2[1];
+  var idx = text.search(/-diamonds/i);
+  if (idx < 0) {
+    var m2 = text.match(/Amount[:\s]+(\d+)/i);
+    return m2 ? m2[1] : null;
+  }
+  var before = text.substring(0, idx);
+  // Try known amounts first (avoids grabbing trailing digits from a glued ID)
+  for (var i = 0; i < KNOWN_SKU_AMOUNTS.length; i++) {
+    var d = KNOWN_SKU_AMOUNTS[i];
+    if (before.length >= d.length && before.slice(-d.length) === d) {
+      return d;
+    }
+  }
+  // Fallback: trailing digit run; cap length to avoid eating a glued hex/ID
+  var dm = before.match(/(\d+)$/);
+  if (dm) {
+    var digits = dm[1];
+    return digits.length > 7 ? digits.slice(-6) : digits;
+  }
   return null;
 }
 
 var KNOWN_GATEWAYS = [
   'happypay', 'xenopay', 'epoint', 'paydollar', 'newebpay',
-  'ecpay', 'linepay', 'jkopay', 'creditcard', 'atm', 'pay168'
+  'ecpay', 'linepay', 'jkopay', 'creditcard', 'atm', 'pay168', 'easypay', 'fsgw', 'nineoneapp'
 ];
 
 function extractGateway(text) {
-  var m1 = text.match(/^Payment\s*Gateway:\s*(\S+)/im);
-  if (m1 && m1[1].toLowerCase() !== 'none') return m1[1].toLowerCase();
+  // Boundary-based extraction handles glued text like "...GatewayeasypayPayment ID:"
+  var v = extractFieldRaw(text, 'Payment Gateway:');
+  if (v) {
+    v = v.split(/\s/)[0].trim();
+    if (v && v.toLowerCase() !== 'none') return v.toLowerCase();
+  }
   var m2 = text.match(/payment-gateway-fee-([a-z0-9]+)/i);
   if (m2) return m2[1].toLowerCase();
   var lower = text.toLowerCase();
