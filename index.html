@@ -99,6 +99,23 @@
   .m3-slot-title { font-size:11px; font-weight:600; color:#7c8ea6; letter-spacing:.08em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
   .m3-slot-title::before { content:''; display:inline-block; width:3px; height:11px; background:var(--purple); border-radius:2px; }
   .tag-badge { display:inline-block; font-family:var(--font-mono); font-size:11px; background:var(--accent-bg); color:var(--accent-light); border:1px solid var(--accent); border-radius:4px; padding:2px 8px; margin-top:6px; }
+  .sheet-link-badge {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 7px 11px;
+    background: #0d1e0d;
+    border: 1px solid var(--accent);
+    border-radius: 7px;
+    font-size: 12px;
+    color: var(--accent-light);
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .sheet-link-badge.show { display: flex; }
+  .sheet-link-badge:hover { background: #143a18; }
+  .sheet-link-badge .icon { font-size: 14px; }
   .cp-lookup-textarea { width:100%; min-height:72px; max-height:420px; resize:none; overflow-y:auto; font-family:var(--font-mono); font-size:11.5px; line-height:1.6; background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--text-primary); outline:none; transition:border-color 0.15s; box-sizing:border-box; }
   .cp-lookup-textarea::placeholder { color:var(--text-muted); }
   .cp-lookup-textarea:focus { border-color:var(--orange); }
@@ -325,9 +342,11 @@
             <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
             <option value="cs:shill_livestream_">直播暗樁用途</option>
             <option value="cs:test_staff_">內部員工測試用鑽</option>
+            <option value="cs:test_partner_">合作第三方測試用派鑽</option>
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-1" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-1"></span></div>
+            <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-1"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           </div>
           <div style="position:relative">
             <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
@@ -367,9 +386,11 @@
             <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
             <option value="cs:shill_livestream_">直播暗樁用途</option>
             <option value="cs:test_staff_">內部員工測試用鑽</option>
+            <option value="cs:test_partner_">合作第三方測試用派鑽</option>
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-2" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-2"></span></div>
+            <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-2"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           </div>
           <div style="position:relative">
             <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
@@ -1141,18 +1162,33 @@ function hideReason3Dropdown(n) {
   }, 180);
 }
 
+// 特定 tag 對應的 Google Sheet 表單連結（可持續擴充）
+var TAG_SHEET_LINKS = {
+  'cs:test_partner_': 'https://docs.google.com/spreadsheets/d/1M_m9C7RJtdz8HKFe52Ys-gQ7LjKZQuegLCdkJ2kG_Dg/edit?gid=854066227#gid=854066227'
+};
+
 function onM3Select(n) {
   var tag     = document.getElementById('m3-reason-type-' + n).value;
   var badge   = document.getElementById('m3-tag-badge-' + n);
   var tagText = document.getElementById('m3-tag-text-' + n);
+  var sheetLink = document.getElementById('m3-sheet-link-' + n);
   if (tag) {
     badge.style.display = 'block';
     tagText.textContent = tag;
     buildCmd3AndCopy(n);
+    if (sheetLink) {
+      if (TAG_SHEET_LINKS[tag]) {
+        sheetLink.href = TAG_SHEET_LINKS[tag];
+        sheetLink.classList.add('show');
+      } else {
+        sheetLink.classList.remove('show');
+      }
+    }
   } else {
     badge.style.display = 'none';
     document.getElementById('m3-cmd-wrap-' + n).style.display = 'none';
     lastCmd3[n] = '';
+    if (sheetLink) sheetLink.classList.remove('show');
   }
 }
 
