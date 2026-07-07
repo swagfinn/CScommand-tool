@@ -848,7 +848,7 @@ function buildCmdNoPaid(u, a, o, gw, rawText) {
   var unknownUsd = !usd;
 
   var gwPart = gw ? gw : 'Gateway';
-  lastCmd = '@jbot-test dp ' + u + '/' + a + ' ' + usdLabel + ' ' + gwPart + '-fulfilled-' + o;
+  lastCmd = '@jbot-test dp ' + u + '/' + a + ' ' + usdLabel + ' ' + gwPart + '-refill-' + o;
 
   if (unknownUsd) {
     hint.classList.add('show');
@@ -867,7 +867,7 @@ function buildCmdNoPaid(u, a, o, gw, rawText) {
     (gw
       ? '<span class="hl-blue">' + esc(gw) + '</span>'
       : '<span class="hl-blue">Gateway</span>') +
-    '<span style="color:var(--text-secondary)">-fulfilled-</span>' +
+    '<span style="color:var(--text-secondary)">-refill-</span>' +
     '<span class="rsn">' + esc(o) + '</span>';
 }
 
