@@ -611,7 +611,7 @@ function parseOrder() {
     document.getElementById('field-gateway-wrap').style.opacity = '';
     document.getElementById('field-gateway-wrap').style.borderColor = 'var(--orange)';
     document.getElementById('field-reason-wrap').style.opacity = '';
-    document.getElementById('f-reason-label').textContent = '@allan dp';
+    document.getElementById('f-reason-label').textContent = '@bot-allan dp';
     document.getElementById('result-section').classList.add('show');
     window._isPaidNone = true;
     buildCmdNoPaid(username, amount, orderId, '', raw);
@@ -769,9 +769,9 @@ function buildCmd() {
   // 情境 1 & 2: Paid 有值時永遠不顯示提示
   var hint = document.getElementById('usd-hint');
   if (hint) hint.classList.remove('show');
-  lastCmd = '@allan deposit ' + u + '/' + a + ' cs:refill_purchase_' + g + '_' + o;
+  lastCmd = '@bot-allan deposit ' + u + '/' + a + ' cs:refill_purchase_' + g + '_' + o;
   display.innerHTML =
-    '<span class="kw">@allan deposit</span> ' +
+    '<span class="kw">@bot-allan deposit</span> ' +
     '<span class="user">' + esc(u) + '</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + esc(a) + '</span> ' +
@@ -846,7 +846,7 @@ function buildCmdNoPaid(u, a, o, gw, rawText) {
   var unknownUsd = !usd;
 
   var gwPart = gw ? gw : 'Gateway';
-  lastCmd = '@allan dp ' + u + '/' + a + ' ' + usdLabel + ' ' + gwPart + '-refill-' + o;
+  lastCmd = '@bot-allan dp ' + u + '/' + a + ' ' + usdLabel + ' ' + gwPart + '-refill-' + o;
 
   if (unknownUsd) {
     hint.classList.add('show');
@@ -855,7 +855,7 @@ function buildCmdNoPaid(u, a, o, gw, rawText) {
   }
 
   display.innerHTML =
-    '<span class="kw">@allan dp</span> ' +
+    '<span class="kw">@bot-allan dp</span> ' +
     '<span class="user">' + esc(u) + '</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + esc(a) + '</span> ' +
@@ -979,9 +979,9 @@ function buildCmd2() {
     lastCmd2 = ''; return;
   }
   var reasonSuffix = reason ? '_' + reason : '';
-  lastCmd2 = '@allan deposit ' + u + '/' + total + ' cs:refund_creator_scam_' + cp + reasonSuffix;
+  lastCmd2 = '@bot-allan deposit ' + u + '/' + total + ' cs:refund_creator_scam_' + cp + reasonSuffix;
   display.innerHTML =
-    '<span class="kw">@allan deposit</span> ' +
+    '<span class="kw">@bot-allan deposit</span> ' +
     '<span class="user">' + esc(u) + '</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">' + total + '</span> ' +
@@ -1212,10 +1212,10 @@ function buildCmd3(n) {
   if (!display || !tag) { lastCmd3[n] = ''; return; }
 
   var reason = extra ? tag + extra : tag.replace(/_$/, '');
-  lastCmd3[n] = '@allan deposit username/diamonds ' + reason;
+  lastCmd3[n] = '@bot-allan deposit username/diamonds ' + reason;
 
   display.innerHTML =
-    '<span class="kw">@allan deposit</span> ' +
+    '<span class="kw">@bot-allan deposit</span> ' +
     '<span class="user">username</span>' +
     '<span style="color:var(--text-secondary)">/</span>' +
     '<span class="amt">diamonds</span> ' +
