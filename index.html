@@ -83,18 +83,19 @@
 
   /* ── Tabs ── */
   .mode-tabs {
-    display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:6px;
     background:var(--glass); border:1px solid var(--edge-soft); border-radius:var(--radius);
     backdrop-filter:blur(18px) saturate(1.4); -webkit-backdrop-filter:blur(18px) saturate(1.4);
     box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.18);
   }
   .tab {
-    padding:10px 8px; border-radius:10px; border:1px solid transparent;
+    padding:9px 6px; border-radius:10px; border:1px solid transparent;
     background:transparent; color:var(--muted); font-family:var(--font-ui);
-    font-size:13px; font-weight:600; cursor:pointer; text-align:center;
-    transition:all .16s; display:flex; flex-direction:column; align-items:center; gap:4px; line-height:1.3;
+    font-size:12px; font-weight:600; cursor:pointer; text-align:center;
+    transition:all .16s; display:flex; flex-direction:row; align-items:center; justify-content:center; gap:6px; line-height:1.3;
+    white-space:nowrap;
   }
-  .tab .tab-icon { font-size:16px; }
+  .tab .tab-icon { font-size:14px; flex:0 0 auto; }
   .tab:hover:not(.active):not(:disabled) { background:var(--glass-2); color:var(--ink); border-color:var(--edge-soft); }
   .tab.active {
     background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.40); color:#fff;
@@ -392,9 +393,10 @@
 </header>
 <main class="container">
   <div class="mode-tabs" role="tablist">
-    <button class="tab active" role="tab" aria-selected="true" data-mode="1"><span class="tab-icon">💎</span><span>補派鑽石</span><span class="tab-chip">支付成功未派</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-mode="2"><span class="tab-icon">🎭</span><span>騙點補鑽</span><span class="tab-chip">REWH 案件</span></button>
-    <button class="tab" role="tab" aria-selected="false" data-mode="3"><span class="tab-icon">📋</span><span>補鑽指令</span><span class="tab-chip">常用區</span></button>
+    <button class="tab active" role="tab" aria-selected="true" data-mode="1"><span class="tab-icon">💎</span><span>訂單補鑽</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="2"><span class="tab-icon">🎭</span><span>騙點補鑽</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="3"><span class="tab-icon">📋</span><span>補鑽指令</span></button>
+    <button class="tab" role="tab" aria-selected="false" data-mode="4"><span class="tab-icon">⬆️</span><span>升等測試</span></button>
   </div>
   <!-- Mode 1 -->
   <div class="panel" id="panel-mode1">
@@ -598,6 +600,48 @@
       </div>
     </div>
   </div>
+  <!-- Mode 4: 升等測試 -->
+  <div class="panel" id="panel-mode4" style="display:none">
+    <div class="panel-header">
+      <div class="panel-dot" style="background:var(--yellow)"></div>
+      <span class="panel-title">升等測試</span>
+      <span class="hint-badge" style="background:rgba(227,179,65,.12);color:var(--yellow);border-color:rgba(227,179,65,.4)">@bot-allan dp / withdraw</span>
+      <a href="https://public.swag.live/help-center/zh-tw/articles/a35615ec-3575-4ce6-adcb-81355a6db12f-%E5%85%A8%E6%96%B0-vip-%E6%A6%AE%E8%80%80%E9%80%B2%E5%8C%96-level-100-%E6%AD%A3%E5%BC%8F%E9%99%8D%E8%87%A8/index.html"
+         target="_blank" rel="noopener"
+         style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding:3px 10px;background:rgba(227,179,65,.12);border:1px solid rgba(227,179,65,.4);border-radius:5px;font-size:11px;color:var(--yellow);text-decoration:none;white-space:nowrap;transition:background 0.15s;"
+         onmouseover="this.style.background='rgba(227,179,65,.22)'" onmouseout="this.style.background='rgba(227,179,65,.12)'">
+        📊 Level 100 全等級門檻
+      </a>
+    </div>
+    <div class="panel-body">
+      <div class="fields-grid">
+        <div class="field-card field-wide">
+          <div class="field-label">Username</div>
+          <input class="field-input" id="m4-username" type="text" autocomplete="off" oninput="buildCmd4()">
+        </div>
+        <div class="field-card field-wide">
+          <div class="field-label">目標等級</div>
+          <select class="m3-select" id="m4-level" onchange="buildCmd4()" style="border-color:rgba(227,179,65,.5);background:rgba(50,35,5,.6)">
+            <option value="">— 選擇目標等級 —</option>
+          </select>
+        </div>
+      </div>
+      <div id="m4-result" style="display:none">
+        <div class="divider"></div>
+        <div class="section-heading">升等指令</div>
+        <div class="cmd-box" style="margin-bottom:10px">
+          <div class="cmd-label">升等（dp）</div>
+          <div class="cmd-text" id="m4-cmd-up"><span class="cmd-placeholder">—</span></div>
+        </div>
+        <div class="section-heading">回收指令</div>
+        <div class="cmd-box">
+          <div class="cmd-label">鑽石回收（withdraw）</div>
+          <div class="cmd-text" id="m4-cmd-wd"><span class="cmd-placeholder">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </main>
 <button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到頂部">↑</button>
 <div class="toast" id="toast">✓ 已複製到剪貼簿</div>
@@ -636,7 +680,7 @@ function switchMode(m) {
   if (m !== 1) r1.classList.remove('show');
   r1.style.display = m === 1 ? '' : 'none';
   if (m !== 2) document.getElementById('result-section2').style.display = 'none';
-
+  document.getElementById('panel-mode4').style.display  = m === 4 ? '' : 'none';
 }
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
@@ -1053,7 +1097,7 @@ function onGatewayInput() {
     if (lastCmd) {
       doCopy(lastCmd, function () {
         showToast('✓ 指令已更新並複製');
-      }, '補派鑽石-Paid:None');
+      }, '訂單補鑽-Paid:None');
     }
   } else {
     buildCmd();
@@ -1064,14 +1108,14 @@ function autoCopyCmdRaw(cmd) {
   if (!cmd) return;
   doCopy(cmd, function () {
     showToast('✓ 指令已自動複製到剪貼簿');
-  }, '補派鑽石-Paid:None');
+  }, '訂單補鑽-Paid:None');
 }
 
 function autoCopyCmd() {
   if (!lastCmd) return;
   doCopy(lastCmd, function () {
     showToast('✓ 指令已自動複製到剪貼簿');
-  }, '補派鑽石');
+  }, '訂單補鑽');
 }
 
 function copyCmd() {
@@ -1087,7 +1131,7 @@ function copyCmd() {
       document.getElementById('copy-icon').textContent  = '📋';
       document.getElementById('copy-label').textContent = '複製';
     }, 2500);
-  }, '補派鑽石');
+  }, '訂單補鑽');
 }
 
 function showError(msg) {
@@ -1632,6 +1676,107 @@ function checkGateOnLoad() {
 }
 
 checkGateOnLoad();
+
+// ── Mode 4: 升等測試 ─────────────────────────────────────────────────────────
+var M4_LEVELS = [
+  [1,500],[2,1800],[3,3500],[4,5800],[5,8900],[6,13100],[7,18700],[8,26200],
+  [9,36300],[10,50000],[11,55050],[12,61200],[13,68450],[14,76800],[15,86250],
+  [16,96800],[17,108450],[18,121200],[19,135050],[20,150000],[21,165505],
+  [22,183120],[23,202845],[24,224680],[25,248625],[26,274680],[27,302845],
+  [28,333120],[29,365505],[30,400000],[31,435260],[32,476020],[33,522280],
+  [34,574040],[35,631300],[36,694060],[37,762320],[38,836080],[39,915340],
+  [40,1000000],[41,1085800],[42,1179200],[43,1280200],[44,1388800],[45,1505000],
+  [46,1628800],[47,1760200],[48,1899200],[49,2045800],[50,2200000],[51,2360250],
+  [52,2536000],[53,2727250],[54,2934000],[55,3156250],[56,3394000],[57,3647250],
+  [58,3916000],[59,4200250],[60,4500000],[61,4810000],[62,5140000],[63,5490000],
+  [64,5860000],[65,6250000],[66,6660000],[67,7090000],[68,7540000],[69,8010000],
+  [70,8500000],[71,8960000],[72,9440000],[73,9940000],[74,10460000],[75,11000000],
+  [76,11560000],[77,12140000],[78,12740000],[79,13360000],[80,14000000],
+  [81,14600000],[82,15400000],[83,16400000],[84,17600000],[85,19000000],
+  [86,20600000],[87,22400000],[88,24400000],[89,26600000],[90,29000000],
+  [91,30000000],[92,31400000],[93,33200000],[94,35400000],[95,38000000],
+  [96,41000000],[97,44400000],[98,48200000],[99,52400000],[100,57000000]
+];
+
+// Populate level select on init
+(function initM4() {
+  var sel = document.getElementById('m4-level');
+  if (!sel) return;
+  M4_LEVELS.forEach(function(pair) {
+    var opt = document.createElement('option');
+    opt.value = pair[0];
+    opt.textContent = 'Lv' + pair[0] + ' (' + pair[1].toLocaleString() + ' 鑽)';
+    sel.appendChild(opt);
+  });
+})();
+
+var m4LastCmdUp = '';
+var m4LastCmdWd = '';
+
+function buildCmd4() {
+  var u   = document.getElementById('m4-username').value.trim();
+  var lv  = document.getElementById('m4-level').value;
+  var res = document.getElementById('m4-result');
+  var cmdUp = document.getElementById('m4-cmd-up');
+  var cmdWd = document.getElementById('m4-cmd-wd');
+
+  // Show commands as long as a level is selected (username optional, shown as placeholder)
+  if (!lv) {
+    res.style.display = 'none';
+    m4LastCmdUp = ''; m4LastCmdWd = '';
+    return;
+  }
+
+  var lvNum = parseInt(lv, 10);
+  var pair  = M4_LEVELS.filter(function(p){ return p[0] === lvNum; })[0];
+  if (!pair) return;
+  var diamonds = pair[1]; // plain integer — no commas
+
+  var displayUser = u || 'username';
+
+  // Date stamp: MMDD (today)
+  var now    = new Date();
+  var mm     = ('0' + (now.getMonth() + 1)).slice(-2);
+  var dd     = ('0' + now.getDate()).slice(-2);
+  var datestamp = mm + dd;
+
+  // Commands use plain integer diamonds (no toLocaleString)
+  m4LastCmdUp = '@bot-allan dp ' + displayUser + '/' + diamonds + ' 0 cs:test_staff_' + datestamp + '_等級調整測試_1';
+  m4LastCmdWd = '@bot-allan withdraw ' + displayUser + '/' + diamonds + ' 測試收回';
+
+  cmdUp.innerHTML =
+    '<span class="kw">@bot-allan dp</span> ' +
+    '<span class="user">' + esc(displayUser) + '</span>' +
+    '<span style="color:var(--faint)">/</span>' +
+    '<span class="amt">' + diamonds + '</span> ' +
+    '<span style="color:var(--faint)">0</span> ' +
+    '<span class="rsn">cs:test_staff_' + datestamp + '_等級調整測試_1</span>';
+
+  cmdWd.innerHTML =
+    '<span class="kw">@bot-allan withdraw</span> ' +
+    '<span class="user">' + esc(displayUser) + '</span>' +
+    '<span style="color:var(--faint)">/</span>' +
+    '<span class="amt">' + diamonds + '</span> ' +
+    '<span style="color:var(--yellow)">測試收回</span>';
+
+  res.style.display = '';
+
+  // Bind click-to-copy on both command boxes
+  var upEl = cmdUp.closest ? cmdUp.closest('.cmd-box') : null;
+  var wdEl = cmdWd.closest ? cmdWd.closest('.cmd-box') : null;
+  if (upEl) {
+    upEl.style.cursor = 'pointer';
+    upEl.onclick = function() {
+      doCopy(m4LastCmdUp, function(){ showToast('✓ 升等指令已複製'); }, '升等測試-dp');
+    };
+  }
+  if (wdEl) {
+    wdEl.style.cursor = 'pointer';
+    wdEl.onclick = function() {
+      doCopy(m4LastCmdWd, function(){ showToast('✓ 回收指令已複製'); }, '升等測試-withdraw');
+    };
+  }
+}
 
 </script>
 </body>
