@@ -426,7 +426,7 @@
       </div>
       <div class="divider"></div>
       <div class="section-heading">生成指令</div>
-      <div class="cmd-box"><div class="cmd-label">jbot command</div><div class="cmd-text" id="cmd-display"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div>
+      <div class="cmd-box"><div class="cmd-label">command</div><div class="cmd-text" id="cmd-display"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div>
     </div>
   </div>
   <!-- Mode 2 -->
@@ -456,7 +456,7 @@
         <div class="field-card field-wide" style="position:relative">
           <div class="field-label">Reason（原因說明，選填）</div>
           <input class="field-input" id="m2-reason" type="text" autocomplete="off" oninput="buildCmd2()" onfocus="showReasonDropdown()" onblur="hideReasonDropdown()">
-          <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:9999;background:#1a1630;border:1px solid rgba(255,166,87,.7);border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.95),0 0 0 1px rgba(255,166,87,.2);backdrop-filter:blur(0px)">
+          <div id="reason-dropdown" style="display:none;position:absolute;left:0;right:0;bottom:calc(100% + 4px);z-index:9999;background:#1a1630;border:1px solid rgba(255,166,87,.7);border-radius:10px;overflow:hidden;box-shadow:0 -8px 40px rgba(0,0,0,.95),0 0 0 1px rgba(255,166,87,.2);backdrop-filter:blur(0px)">
             <div style="padding:6px 10px;font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.12)">最近使用</div>
             <div id="reason-list"></div>
             <div id="reason-empty" style="padding:10px 12px;font-size:12px;color:rgba(255,255,255,.45);display:none">尚無紀錄</div>
@@ -470,7 +470,7 @@
   <!-- Mode 2 Result -->
   <div class="panel" id="result-section2" style="display:none">
     <div class="panel-header"><div class="panel-dot" style="background:var(--orange)"></div><span class="panel-title">生成指令</span></div>
-    <div class="panel-body"><div class="cmd-box"><div class="cmd-label">jbot command</div><div class="cmd-text" id="cmd-display2"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div></div>
+    <div class="panel-body"><div class="cmd-box"><div class="cmd-label">command</div><div class="cmd-text" id="cmd-display2"><span class="cmd-placeholder">填妥欄位後指令將在此顯示…</span></div></div></div>
   </div>
   <!-- Mode 2 CP Lookup -->
   <div class="panel" id="panel-cp-lookup" style="display:none">
@@ -512,6 +512,7 @@
             <option value="cs:refund_gift_">送禮遇到異常的鑽石返還</option>
             <option value="cs:comp_livestream_">觀看直播遇到異常的補償</option>
             <option value="cs:comp_unlock_">觀看影片遇到異常的補償</option>
+            <option value="cs:dup-unlock_">重複解鎖／舊文重發</option>
             <option value="cs:comp_creator_revenue_">主播收益異常補償（bug 導致未收到收益）</option>
             <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
             <option value="cs:shill_livestream_">直播暗樁用途</option>
@@ -520,10 +521,9 @@
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-1" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-1"></span></div>
-            <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-1"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           </div>
           <div style="position:relative">
-            <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
+            <div class="field-label" id="m3-reason-label-1" style="margin-bottom:6px">Reason（原因說明，選填）</div>
             <input class="m3-reason-input" id="m3-reason-extra-1" type="text" autocomplete="off"
               placeholder="輸入原因說明（選填）…"
               oninput="onM3ReasonInput(1)"
@@ -535,9 +535,10 @@
               <div id="reason3-empty-1" style="padding:10px 12px;font-size:12px;color:rgba(255,255,255,.4);display:none">尚無紀錄</div>
             </div>
           </div>
+          <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-1"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           <div id="m3-cmd-wrap-1" style="display:none">
             <div class="cmd-box m3-cmd-box" style="margin-top:0">
-              <div class="cmd-label">jbot command</div>
+              <div class="cmd-label">command</div>
               <div class="cmd-text" id="cmd-display3-1" style="padding-right:76px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
@@ -564,6 +565,7 @@
             <option value="cs:refund_gift_">送禮遇到異常的鑽石返還</option>
             <option value="cs:comp_livestream_">觀看直播遇到異常的補償</option>
             <option value="cs:comp_unlock_">觀看影片遇到異常的補償</option>
+            <option value="cs:dup-unlock_">重複解鎖／舊文重發</option>
             <option value="cs:comp_creator_revenue_">主播收益異常補償（bug 導致未收到收益）</option>
             <option value="cs:comp_bug_">其他難以歸類或突發異常 bug 補償</option>
             <option value="cs:shill_livestream_">直播暗樁用途</option>
@@ -572,10 +574,9 @@
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-2" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-2"></span></div>
-            <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-2"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           </div>
           <div style="position:relative">
-            <div class="field-label" style="margin-bottom:6px">Reason（原因說明，選填）</div>
+            <div class="field-label" id="m3-reason-label-2" style="margin-bottom:6px">Reason（原因說明，選填）</div>
             <input class="m3-reason-input" id="m3-reason-extra-2" type="text" autocomplete="off"
               placeholder="輸入原因說明（選填）…"
               oninput="onM3ReasonInput(2)"
@@ -587,9 +588,10 @@
               <div id="reason3-empty-2" style="padding:10px 12px;font-size:12px;color:rgba(255,255,255,.4);display:none">尚無紀錄</div>
             </div>
           </div>
+          <a href="#" target="_blank" rel="noopener" class="sheet-link-badge" id="m3-sheet-link-2"><span class="icon">📊</span><span>開啟 鑽石／分數申請 表單</span></a>
           <div id="m3-cmd-wrap-2" style="display:none">
             <div class="cmd-box m3-cmd-box" style="margin-top:0">
-              <div class="cmd-label">jbot command</div>
+              <div class="cmd-label">command</div>
               <div class="cmd-text" id="cmd-display3-2" style="padding-right:76px">
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
@@ -661,6 +663,41 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('scroll', function () {
     var btn = document.getElementById('scroll-top');
     if (btn) btn.classList.toggle('visible', window.scrollY > 200);
+  });
+
+  // ── Triple-click any text input → clear the field ──────────────────────────
+  document.addEventListener('click', function (e) {
+    var el = e.target;
+    if ((el.classList.contains('field-input') || el.classList.contains('m3-reason-input')) && e.detail === 3) {
+      el.value = '';
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.focus();
+      showToast('🗑 欄位已清空');
+    }
+  });
+
+  // ── Double-click any cmd-box → copy the command ────────────────────────────
+  document.addEventListener('dblclick', function (e) {
+    var box = e.target.closest('.cmd-box');
+    if (!box) return;
+    // Find which cmd-text is inside and determine which lastCmd to copy
+    var id = box.querySelector('[id^="cmd-display"]');
+    var cmdText = '';
+    if (id) {
+      var idStr = id.id; // e.g. "cmd-display", "cmd-display2", "cmd-display3-1", "m4-cmd-up", "m4-cmd-wd"
+      if (idStr === 'cmd-display')   cmdText = lastCmd;
+      else if (idStr === 'cmd-display2')  cmdText = lastCmd2;
+      else if (idStr === 'cmd-display3-1') cmdText = lastCmd3[1];
+      else if (idStr === 'cmd-display3-2') cmdText = lastCmd3[2];
+      else if (idStr === 'm4-cmd-up')  cmdText = m4LastCmdUp;
+      else if (idStr === 'm4-cmd-wd')  cmdText = m4LastCmdWd;
+    }
+    if (!cmdText) return;
+    doCopy(cmdText, function () {
+      showToast('✓ 雙擊複製成功');
+      box.style.outline = '2px solid var(--accent-light)';
+      setTimeout(function () { box.style.outline = ''; }, 800);
+    });
   });
 });
 
@@ -1397,14 +1434,31 @@ function hideReason3Dropdown(n) {
 
 // 特定 tag 對應的 Google Sheet 表單連結（可持續擴充）
 var TAG_SHEET_LINKS = {
-  'cs:test_partner_': 'https://docs.google.com/spreadsheets/d/1M_m9C7RJtdz8HKFe52Ys-gQ7LjKZQuegLCdkJ2kG_Dg/edit?gid=854066227#gid=854066227'
+  'cs:test_partner_': 'https://docs.google.com/spreadsheets/d/1M_m9C7RJtdz8HKFe52Ys-gQ7LjKZQuegLCdkJ2kG_Dg/edit?gid=854066227#gid=854066227',
+  'cs:dup-unlock_':   'https://swagfinn.github.io/cstagtool/'
 };
+
+var DUP_UNLOCK_TAG = 'cs:dup-unlock_';
 
 function onM3Select(n) {
   var tag     = document.getElementById('m3-reason-type-' + n).value;
   var badge   = document.getElementById('m3-tag-badge-' + n);
   var tagText = document.getElementById('m3-tag-text-' + n);
   var sheetLink = document.getElementById('m3-sheet-link-' + n);
+  var reasonLabel = document.getElementById('m3-reason-label-' + n);
+  var reasonInput = document.getElementById('m3-reason-extra-' + n);
+
+  // Toggle label and placeholder based on whether dup-unlock is selected
+  var isDup = (tag === DUP_UNLOCK_TAG);
+  if (reasonLabel) {
+    reasonLabel.textContent = isDup ? 'Message ID（原因說明，必填）' : 'Reason（原因說明，選填）';
+    reasonLabel.style.color = isDup ? 'var(--red)' : '';
+  }
+  if (reasonInput) {
+    reasonInput.placeholder = isDup ? '輸入 Message ID（必填）…' : '輸入原因說明（選填）…';
+    reasonInput.style.borderColor = isDup ? 'var(--red)' : '';
+  }
+
   if (tag) {
     badge.style.display = 'block';
     tagText.textContent = tag;
@@ -1412,6 +1466,15 @@ function onM3Select(n) {
     if (sheetLink) {
       if (TAG_SHEET_LINKS[tag]) {
         sheetLink.href = TAG_SHEET_LINKS[tag];
+        var slIcon = sheetLink.querySelector('.icon');
+        var slText = sheetLink.querySelector('span:last-child');
+        if (tag === DUP_UNLOCK_TAG) {
+          if (slIcon) slIcon.textContent = '🏷️';
+          if (slText) slText.textContent = '下架重複貼文 Tag tool';
+        } else {
+          if (slIcon) slIcon.textContent = '📊';
+          if (slText) slText.textContent = '開啟 鑽石／分數申請 表單';
+        }
         sheetLink.classList.add('show');
       } else {
         sheetLink.classList.remove('show');
@@ -1421,7 +1484,15 @@ function onM3Select(n) {
     badge.style.display = 'none';
     document.getElementById('m3-cmd-wrap-' + n).style.display = 'none';
     lastCmd3[n] = '';
-    if (sheetLink) sheetLink.classList.remove('show');
+    if (sheetLink) {
+      sheetLink.classList.remove('show');
+      var slIcon2 = sheetLink.querySelector('.icon');
+      var slText2 = sheetLink.querySelector('span:last-child');
+      if (slIcon2) slIcon2.textContent = '📊';
+      if (slText2) slText2.textContent = '開啟 鑽石／分數申請 表單';
+    }
+    if (reasonLabel) { reasonLabel.textContent = 'Reason（原因說明，選填）'; reasonLabel.style.color = ''; }
+    if (reasonInput) { reasonInput.placeholder = '輸入原因說明（選填）…'; reasonInput.style.borderColor = ''; }
   }
 }
 
@@ -1445,6 +1516,28 @@ function buildCmd3(n) {
   var display = document.getElementById('cmd-display3-' + n);
   if (!display || !tag) { lastCmd3[n] = ''; return; }
 
+  var isDup = (tag === DUP_UNLOCK_TAG);
+
+  // dup-unlock: extra is required; if empty, show empty placeholder and block command
+  if (isDup) {
+    if (!extra) {
+      lastCmd3[n] = '';
+      display.innerHTML = '<span class="cmd-placeholder">請填入 Message ID 後指令將在此顯示…</span>';
+      return;
+    }
+    // Format: @bot-allan deposit username/diamonds cs:dup-unlock_msgid
+    lastCmd3[n] = '@bot-allan deposit ' + u + '/' + d + ' cs:dup-unlock_' + extra;
+    display.innerHTML =
+      '<span class="kw">@bot-allan deposit</span> ' +
+      '<span class="user">' + esc(u) + '</span>' +
+      '<span style="color:var(--faint)">/</span>' +
+      '<span class="amt">' + esc(d) + '</span> ' +
+      '<span class="rsn">cs:dup-unlock_</span>' +
+      '<span style="color:var(--yellow)">' + esc(extra) + '</span>';
+    return;
+  }
+
+  // Normal tags
   var reason = extra ? tag + extra : tag.replace(/_$/, '');
   lastCmd3[n] = '@bot-allan deposit ' + u + '/' + d + ' ' + reason;
 
@@ -1465,7 +1558,9 @@ function buildCmd3AndCopy(n) {
   buildCmd3(n);
   document.getElementById('m3-cmd-wrap-' + n).style.display = '';
   var extra = document.getElementById('m3-reason-extra-' + n).value.trim();
-  if (extra) saveReason3(extra);
+  // Don't save Message ID into Reason history (dup-unlock special case)
+  // Also don't auto-copy if command is empty (dup-unlock with no message ID)
+  if (extra && tag !== DUP_UNLOCK_TAG) saveReason3(extra);
   if (lastCmd3[n]) {
     doCopy(lastCmd3[n], function () {
       showToast('✓ 指令已自動複製到剪貼簿');
