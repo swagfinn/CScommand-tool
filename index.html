@@ -689,7 +689,7 @@ document.addEventListener('DOMContentLoaded', function () {
       else if (idStr === 'cmd-display2')  cmdText = lastCmd2;
       else if (idStr === 'cmd-display3-1') cmdText = lastCmd3[1];
       else if (idStr === 'cmd-display3-2') cmdText = lastCmd3[2];
-      else if (idStr === 'm4-cmd-up')  cmdText = m4LastCmdUp;
+      else if (idStr === 'm4-cmd-up')  cmdText = typeof m4LastCmdUp === 'function' ? m4LastCmdUp() : m4LastCmdUp;
       else if (idStr === 'm4-cmd-wd')  cmdText = m4LastCmdWd;
     }
     if (!cmdText) return;
@@ -1829,30 +1829,37 @@ function buildCmd4() {
 
   var displayUser = u || 'username';
 
-  // Date stamp: MMDD (today)
-  var now    = new Date();
-  var mm     = ('0' + (now.getMonth() + 1)).slice(-2);
-  var dd     = ('0' + now.getDate()).slice(-2);
-  var datestamp = mm + dd;
+  // Timestamp is calculated at copy time (not display time) so it reflects
+  // the actual moment the user clicks copy. We build cmd as a function.
+  function getTimestamp() {
+    var t  = new Date();
+    var mm = ('0' + (t.getMonth() + 1)).slice(-2);
+    var dd = ('0' + t.getDate()).slice(-2);
+    var hh = ('0' + t.getHours()).slice(-2);
+    var mi = ('0' + t.getMinutes()).slice(-2);
+    return mm + dd + hh + mi;
+  }
 
-  // Commands use plain integer diamonds (no toLocaleString)
-  m4LastCmdUp = '@bot-allan dp ' + displayUser + '/' + diamonds + ' 0 cs:test_staff_' + datestamp + '_等級調整測試_1';
-  m4LastCmdWd = '@bot-allan withdraw ' + displayUser + '/' + diamonds + ' 測試收回';
+  // Store as lazy functions so copy grabs the live timestamp
+  m4LastCmdUp = function() { return '@bot-allan dp ' + displayUser + '/' + diamonds + ' 0 vip-level-test-' + getTimestamp(); };
+  m4LastCmdWd = '@bot-allan withdraw ' + displayUser + '/' + diamonds + ' vip-level-test';
 
+  // Display uses a placeholder timestamp to show format; actual value generated on copy
+  var sampleTs = getTimestamp();
   cmdUp.innerHTML =
     '<span class="kw">@bot-allan dp</span> ' +
     '<span class="user">' + esc(displayUser) + '</span>' +
     '<span style="color:var(--faint)">/</span>' +
     '<span class="amt">' + diamonds + '</span> ' +
     '<span style="color:var(--faint)">0</span> ' +
-    '<span class="rsn">cs:test_staff_' + datestamp + '_等級調整測試_1</span>';
+    '<span class="rsn">vip-level-test-' + sampleTs + '</span>';
 
   cmdWd.innerHTML =
     '<span class="kw">@bot-allan withdraw</span> ' +
     '<span class="user">' + esc(displayUser) + '</span>' +
     '<span style="color:var(--faint)">/</span>' +
     '<span class="amt">' + diamonds + '</span> ' +
-    '<span style="color:var(--yellow)">測試收回</span>';
+    '<span style="color:var(--yellow)">vip-level-test</span>';
 
   res.style.display = '';
 
@@ -1862,7 +1869,13 @@ function buildCmd4() {
   if (upEl) {
     upEl.style.cursor = 'pointer';
     upEl.onclick = function() {
-      doCopy(m4LastCmdUp, function(){ showToast('✓ 升等指令已複製'); }, '升等測試-dp');
+      var cmd = typeof m4LastCmdUp === 'function' ? m4LastCmdUp() : m4LastCmdUp;
+      doCopy(cmd, function(){
+        showToast('✓ 升等指令已複製');
+        // Refresh display with the just-used timestamp
+        var ts = cmd.split('vip-level-test-')[1] || '';
+        if (ts) cmdUp.querySelector('.rsn') && (cmdUp.innerHTML = cmdUp.innerHTML.replace(/vip-level-test-\d{8}/, 'vip-level-test-' + ts));
+      }, '升等測試-dp');
     };
   }
   if (wdEl) {
