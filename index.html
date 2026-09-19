@@ -227,6 +227,32 @@
     border-radius:6px; padding:2px 9px; letter-spacing:.02em; white-space:nowrap;
   }
 
+  /* ── Mode 3 TOP3 quick picks ── */
+  .m3-top3-wrap { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:2px; }
+  .m3-top3-chip {
+    font-size:11px; font-family:var(--font-ui); font-weight:600;
+    padding:4px 10px; border-radius:20px; cursor:pointer;
+    background:rgba(210,168,255,.12); border:1px solid rgba(210,168,255,.35); color:var(--purple);
+    transition:background .15s; white-space:nowrap;
+  }
+  .m3-top3-chip:hover { background:rgba(210,168,255,.25); }
+  .m3-top3-chip.empty { opacity:.35; cursor:default; pointer-events:none; }
+
+  /* ── Mode 3 script box (話術) ── */
+  .m3-script-box {
+    margin-top:8px; background:var(--well); border:1px solid var(--edge-soft);
+    border-radius:10px; padding:12px 14px; cursor:pointer;
+    transition:outline .12s; position:relative;
+  }
+  .m3-script-box:hover { outline:1px solid var(--accent-light); }
+  .m3-script-label {
+    font-size:10px; font-weight:700; color:var(--faint); letter-spacing:.08em;
+    text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:6px;
+  }
+  .m3-script-label::after { content:''; flex:1; height:1px; background:var(--edge-soft); }
+  .m3-script-text { font-size:13px; color:var(--muted); line-height:1.65; }
+  .m3-script-hint { font-size:10px; color:var(--faint); margin-top:5px; }
+
   /* ── Mode 3 select & slot ── */
   .m3-reason-input {
     width:100%; background:rgba(10,18,52,.6); border:1.5px solid #3b6fd4; border-radius:8px;
@@ -501,7 +527,7 @@
           </div>
           <div>
             <div class="field-label" style="margin-bottom:4px">Diamonds（選填）</div>
-            <input class="m3-reason-input" id="m3-diamonds-1" type="text" autocomplete="off" oninput="buildCmd3(1)" style="font-size:12px;padding:6px 10px">
+            <input class="m3-reason-input" id="m3-diamonds-1" type="text" autocomplete="off" oninput="buildCmd3(1); updateM3Script(1)" style="font-size:12px;padding:6px 10px">
           </div>
           <div>
             <div class="field-label" style="margin-bottom:6px">補鑽原因</div>
@@ -521,6 +547,14 @@
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-1" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-1"></span></div>
+          </div>
+          <div style="margin-bottom:4px">
+            <div class="field-label" style="margin-bottom:4px">TOP3 常用 Reason</div>
+            <div class="m3-top3-wrap" id="m3-top3-1">
+              <span class="m3-top3-chip empty" id="m3-top3-1-0">—</span>
+              <span class="m3-top3-chip empty" id="m3-top3-1-1">—</span>
+              <span class="m3-top3-chip empty" id="m3-top3-1-2">—</span>
+            </div>
           </div>
           <div style="position:relative">
             <div class="field-label" id="m3-reason-label-1" style="margin-bottom:6px">Reason（原因說明，選填）</div>
@@ -544,6 +578,11 @@
               </div>
               <button class="m3-copy-btn" id="m3-copy-btn-1" onclick="manualCopyCmd3(1)" title="複製指令">📋 複製</button>
             </div>
+            <div class="m3-script-box" id="m3-script-box-1" ondblclick="copyM3Script(1)">
+              <div class="m3-script-label">話術</div>
+              <div class="m3-script-text" id="m3-script-text-1">—</div>
+              <div class="m3-script-hint">雙擊複製話術</div>
+            </div>
           </div>
         </div>
         <div class="m3-slot">
@@ -554,7 +593,7 @@
           </div>
           <div>
             <div class="field-label" style="margin-bottom:4px">Diamonds（選填）</div>
-            <input class="m3-reason-input" id="m3-diamonds-2" type="text" autocomplete="off" oninput="buildCmd3(2)" style="font-size:12px;padding:6px 10px">
+            <input class="m3-reason-input" id="m3-diamonds-2" type="text" autocomplete="off" oninput="buildCmd3(2); updateM3Script(2)" style="font-size:12px;padding:6px 10px">
           </div>
           <div>
             <div class="field-label" style="margin-bottom:6px">補鑽原因</div>
@@ -574,6 +613,14 @@
             <option value="cs:others_">其他</option>
             </select>
             <div id="m3-tag-badge-2" style="display:none;margin-top:6px"><span class="tag-badge" id="m3-tag-text-2"></span></div>
+          </div>
+          <div style="margin-bottom:4px">
+            <div class="field-label" style="margin-bottom:4px">TOP3 常用 Reason</div>
+            <div class="m3-top3-wrap" id="m3-top3-2">
+              <span class="m3-top3-chip empty" id="m3-top3-2-0">—</span>
+              <span class="m3-top3-chip empty" id="m3-top3-2-1">—</span>
+              <span class="m3-top3-chip empty" id="m3-top3-2-2">—</span>
+            </div>
           </div>
           <div style="position:relative">
             <div class="field-label" id="m3-reason-label-2" style="margin-bottom:6px">Reason（原因說明，選填）</div>
@@ -596,6 +643,11 @@
                 <span class="cmd-placeholder">選擇補鑽原因後指令將在此顯示…</span>
               </div>
               <button class="m3-copy-btn" id="m3-copy-btn-2" onclick="manualCopyCmd3(2)" title="複製指令">📋 複製</button>
+            </div>
+            <div class="m3-script-box" id="m3-script-box-2" ondblclick="copyM3Script(2)">
+              <div class="m3-script-label">話術</div>
+              <div class="m3-script-text" id="m3-script-text-2">—</div>
+              <div class="m3-script-hint">雙擊複製話術</div>
             </div>
           </div>
         </div>
@@ -719,6 +771,7 @@ function switchMode(m) {
   document.getElementById('panel-mode2').style.display      = m === 2 ? '' : 'none';
   document.getElementById('panel-cp-lookup').style.display  = m === 2 ? '' : 'none';
   document.getElementById('panel-mode3').style.display  = m === 3 ? '' : 'none';
+  if (m === 3) { renderTop3(1); renderTop3(2); }
   var r1 = document.getElementById('result-section');
   if (m !== 1) r1.classList.remove('show');
   r1.style.display = m === 1 ? '' : 'none';
@@ -1446,6 +1499,56 @@ var TAG_SHEET_LINKS = {
 
 var DUP_UNLOCK_TAG = 'cs:dup-unlock_';
 
+// ── Mode 3 TOP3 Reason quick picks ──────────────────────────────────────────
+function renderTop3(n) {
+  var list = loadReasons3().slice(0, 3);
+  for (var i = 0; i < 3; i++) {
+    var chip = document.getElementById('m3-top3-' + n + '-' + i);
+    if (!chip) continue;
+    if (list[i]) {
+      var reason = list[i];
+      chip.textContent = reason;
+      chip.classList.remove('empty');
+      (function(r, slot) {
+        chip.onclick = function () {
+          var inp = document.getElementById('m3-reason-extra-' + slot);
+          if (inp) { inp.value = r; buildCmd3AndCopy(slot); }
+        };
+      })(reason, n);
+    } else {
+      chip.textContent = '—';
+      chip.classList.add('empty');
+      chip.onclick = null;
+    }
+  }
+}
+
+// ── Mode 3 話術 ──────────────────────────────────────────────────────────────
+function updateM3Script(n) {
+  var diamEl = document.getElementById('m3-diamonds-' + n);
+  var d = (diamEl && diamEl.value.trim()) ? diamEl.value.trim() : 'diamonds';
+  var scriptEl = document.getElementById('m3-script-text-' + n);
+  if (scriptEl) {
+    scriptEl.textContent = '您好，已將 ' + d + ' 鑽石退至您的帳戶中，還請您刷新日誌確認查收，謝謝您。';
+  }
+}
+
+var m3ScriptCache = ['', ''];
+function copyM3Script(n) {
+  var scriptEl = document.getElementById('m3-script-text-' + n);
+  if (!scriptEl) return;
+  var txt = scriptEl.textContent;
+  if (!txt || txt === '—') return;
+  doCopy(txt, function () {
+    showToast('✓ 話術已複製');
+    var box = document.getElementById('m3-script-box-' + n);
+    if (box) {
+      box.style.outline = '2px solid var(--accent-light)';
+      setTimeout(function () { box.style.outline = ''; }, 800);
+    }
+  });
+}
+
 function onM3Select(n) {
   var tag     = document.getElementById('m3-reason-type-' + n).value;
   var badge   = document.getElementById('m3-tag-badge-' + n);
@@ -1566,7 +1669,11 @@ function buildCmd3AndCopy(n) {
   var extra = document.getElementById('m3-reason-extra-' + n).value.trim();
   // Don't save Message ID into Reason history (dup-unlock special case)
   // Also don't auto-copy if command is empty (dup-unlock with no message ID)
-  if (extra && tag !== DUP_UNLOCK_TAG) saveReason3(extra);
+  if (extra && tag !== DUP_UNLOCK_TAG) {
+    saveReason3(extra);
+    renderTop3(n);
+  }
+  updateM3Script(n);
   if (lastCmd3[n]) {
     doCopy(lastCmd3[n], function () {
       showToast('✓ 指令已自動複製到剪貼簿');
