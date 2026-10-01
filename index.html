@@ -214,6 +214,8 @@
   .hl-blue { color:var(--blue); font-weight:700; }
   .usd-hint { display:none; font-size:11px; color:var(--yellow); margin-top:5px; }
   .usd-hint.show { display:block; }
+  .amount-hint { display:none; font-size:11px; color:var(--red); margin-top:5px; line-height:1.5; }
+  .amount-hint.show { display:block; }
 
   /* ── Reason dropdown ── */
   .reason-item { display:flex; align-items:center; gap:10px; padding:8px 12px; cursor:pointer; transition:background .1s; border-bottom:.5px solid var(--edge-soft); }
@@ -441,7 +443,11 @@
       <div class="section-heading">擷取欄位（可手動修改）</div>
       <div class="fields-grid">
         <div class="field-card"><div class="field-label">Username</div><input class="field-input" id="f-username" type="text" autocomplete="off" oninput="buildCmd()"></div>
-        <div class="field-card"><div class="field-label">Amount（鑽石數）</div><input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="buildCmd()"></div>
+        <div class="field-card" id="field-amount-wrap">
+          <div class="field-label">Amount（鑽石數）</div>
+          <input class="field-input" id="f-amount" type="text" autocomplete="off" oninput="onAmountInput()">
+          <div class="amount-hint" id="amount-hint">⚠ 鑽石數可能與 Payment ID 黏在一起，請對照訂單的 SKU 確認</div>
+        </div>
         <div class="field-card field-wide"><div class="field-label">Order ID</div><input class="field-input" id="f-orderid" type="text" autocomplete="off" oninput="buildCmd()"></div>
         <div class="field-card" id="field-gateway-wrap">
           <div class="field-label" id="f-gateway-label">Payment Gateway</div>
@@ -880,16 +886,67 @@ function prettyFormatOrder(text) {
   return out.trim();
 }
 
+// 把 Slack 複製的 HTML 轉成保留區塊邊界的純文字。
+// Slack 的 SKU 是 inline code（<code>），純文字複製時會直接黏在 Payment ID 後面，
+// 例如 "Payment ID: 26092813524565958" + "17499-diamonds-..." → "2609281352456595817499-diamonds-..."
+// 改讀 HTML 並在區塊 / code 前後補換行，就能保留原本的分段。
+function htmlToPlainText(html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+  doc.querySelectorAll('br').forEach(function (b) { b.replaceWith('\n'); });
+  doc.querySelectorAll('code, pre, p, div, li, tr').forEach(function (el) {
+    el.before('\n');
+    el.after('\n');
+  });
+  return doc.body.textContent || '';
+}
+
 function cleanOrderPaste(e) {
   e.preventDefault();
-  var text = (e.clipboardData || window.clipboardData).getData('text');
+  var cd = e.clipboardData || window.clipboardData;
+  var plain = cd.getData('text') || '';
+  var html = '';
+  try { html = cd.getData('text/html') || ''; } catch (err) { html = ''; }
+
+  var text = plain;
+  if (html) {
+    var fromHtml = htmlToPlainText(html);
+    // HTML 轉換結果需包含關鍵欄位才採用，否則退回純文字
+    if (/Username\s*:/i.test(fromHtml)) text = fromHtml;
+  }
+
   // Strip markdown links and backticks
   text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
   text = text.replace(/`/g, '');
+  // 每行去頭尾空白、移除空行（例如 " x1" → "x1"）
+  text = text.split('\n').map(function (l) { return l.trim(); })
+             .filter(function (l) { return l; }).join('\n');
   // Cosmetic re-formatting for readability (parsing is unaffected either way)
   text = prettyFormatOrder(text);
   var ta = document.getElementById('raw-input');
   ta.value = text;
+}
+
+// 鑽石數不確定時（SKU 與 Payment ID 黏在一起且不在已知清單）顯示提醒
+function applyAmountWarning(uncertain) {
+  var hint = document.getElementById('amount-hint');
+  var wrap = document.getElementById('field-amount-wrap');
+  var input = document.getElementById('f-amount');
+  if (uncertain) {
+    hint.classList.add('show');
+    wrap.style.borderColor = 'var(--red)';
+    input.style.borderBottomColor = 'var(--red)';
+  } else {
+    hint.classList.remove('show');
+    wrap.style.borderColor = '';
+    input.style.borderBottomColor = '';
+  }
+}
+
+// 使用者手動修改鑽石數後，視為已確認，移除提醒
+function onAmountInput() {
+  applyAmountWarning(false);
+  if (window._isPaidNone) onGatewayInput();
+  else buildCmd();
 }
 
 function parseOrder() {
@@ -900,6 +957,7 @@ function parseOrder() {
   var username = extractUsername(raw);
   var orderId  = extractOrderId(raw);
   var amount   = extractAmount(raw);
+  var amountUncertain = _amountUncertain;
   var paid     = extractPaid(raw);
   var isPaidNone = !paid || paid.toLowerCase() === 'none';
 
@@ -929,6 +987,8 @@ function parseOrder() {
     document.getElementById('f-reason-label').textContent = '@bot-allan dp';
     document.getElementById('result-section').classList.add('show');
     window._isPaidNone = true;
+    applyAmountWarning(amountUncertain);
+    if (amountUncertain) showError('鑽石數無法確定（' + amount + '），請核對 Amount 後再使用指令');
     buildCmdNoPaid(username, amount, orderId, '', raw);
     document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
@@ -954,8 +1014,14 @@ function parseOrder() {
   document.getElementById('f-gateway').value  = gateway;
 
   document.getElementById('result-section').classList.add('show');
+  applyAmountWarning(amountUncertain);
   buildCmd();
-  autoCopyCmd();
+  if (amountUncertain) {
+    // 不確定時不自動複製，避免客服直接貼出錯誤指令
+    showError('鑽石數無法確定（' + amount + '），請核對 Amount 後再複製指令');
+  } else {
+    autoCopyCmd();
+  }
   document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -1021,19 +1087,27 @@ function extractOrderId(text) {
 
 // Known diamond/SKU amounts — checked first (longest match) to correctly split
 // an amount that may be glued directly to a preceding Order/Payment ID
+// 注意：長的數字要排在短的前面，避免被短的先比對到
 var KNOWN_SKU_AMOUNTS = [
   '2899999', '1859999', '1059999', '809999', '429999', '329999', '159999',
-  '119999', '61999', '54999', '34599', '28999', '24999', '18599', '15999',
+  '119999', '61999', '54999', '34599', '28999', '24999', '18599', '17499', '15999',
   '13499', '7999', '6880', '8880', '8599', '4999', '3999', '1999', '9990'
 ];
 
+// 若最近一次 extractAmount 是用猜的（黏住且不在已知清單），會設為 true
+var _amountUncertain = false;
+
 function extractAmount(text) {
+  _amountUncertain = false;
   var idx = text.search(/-diamonds/i);
   if (idx < 0) {
     var m2 = text.match(/Amount[:\s]+(\d+)/i);
     return m2 ? m2[1] : null;
   }
   var before = text.substring(0, idx);
+  // SKU 前面是換行 / 空白 / 開頭 → 數字是乾淨的，直接採用
+  var clean = before.match(/(?:^|\s)(\d{3,8})$/);
+  if (clean) return clean[1];
   // Try known amounts first (avoids grabbing trailing digits from a glued ID)
   for (var i = 0; i < KNOWN_SKU_AMOUNTS.length; i++) {
     var d = KNOWN_SKU_AMOUNTS[i];
@@ -1045,7 +1119,11 @@ function extractAmount(text) {
   var dm = before.match(/(\d+)$/);
   if (dm) {
     var digits = dm[1];
-    return digits.length > 7 ? digits.slice(-6) : digits;
+    if (digits.length > 7) {
+      _amountUncertain = true;   // 黏住且無法確定 → 提醒客服核對
+      return digits.slice(-6);
+    }
+    return digits;
   }
   return null;
 }
